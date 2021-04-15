@@ -3,15 +3,30 @@ version: "2.0"
 intents:
   - greet
   - goodbye
+  - thank
   - affirm
   - deny
   - mood_great
   - mood_unhappy
   - bot_challenge
+  - None
+
+actions:
+  - action_hello_world
+  - utter_fallback_warning
 
 responses:
   utter_greet:
   - text: "Hey! How are you?"
+
+  utter_thank:
+  - text: "You're welcome."
+  - text: "You are welcome."
+  - text: "No problem."
+  - text: "My pleasure."
+  - text: "It’s my pleasure."
+  - text: "Glad to help."
+  - text: "Sure!"
 
   utter_cheer_up:
   - text: "Here is something to cheer you up:"

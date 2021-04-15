@@ -1,196 +1,100 @@
 version: "2.0"
 
 nlu:
-  - intent: greet
-    examples: |
-      - hey
-      - hello
-      - hi
-      - hello there
-      - good morning
-      - good evening
-      - moin
-      - hey there
-      - let's go
-      - hey dude
-      - good morning
-      - good evening
-      - good afternoon
-      - good day
+- intent: greet
+  examples: |
+    - hey
+    - hallo
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
 
-  - intent: goodbye
-    examples: |
-      - good afternoon
-      - cu
-      - good by
-      - cee you later
-      - good night
-      - bye
-      - goodbye
-      - have a nice day
-      - see you around
-      - bye bye
-      - see you later
-      - have a great day
+- intent: goodbye
+  examples: |
+    - good afternoon
+    - c u
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
 
-  - intent: affirm
-    examples: |
-      - yes
-      - y
-      - indeed
-      - of course
-      - that sounds good
-      - correct
+- intent: thank
+  examples: |
+    - thanks
+    - thanhk you
+    - tks
 
-  - intent: deny
-    examples: |
-      - no
-      - n
-      - never
-      - I don't think so
-      - don't like that
-      - no way
-      - not really
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
 
-  - intent: ask_word
-    examples: |
-      - what is a word?
-      - what is a word in English?
-      - how can we describe a word?
-      - when makes a word a word?
-      - when a word is to be considered a word?
-      - what are the criterions of a word?
-      - what are the characteristics of a word?
-      - what are the definitions of words?
-      - What are the qualities of a word?
+- intent: deny
+  examples: |
+    - no
+    - n
+    - nah
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
 
-  - intent: ask_sentence_definition
-    examples: |
-      - what is a sentence?
-      - what is a sentence in English?
-      - what makes a sentence?
-      - what are the characteristics of a sentence?
-      - what things should be said about a sentence?
-      - sentence definition
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I am amazing
+    - I am going to save the world
+    - super stoked
+    - extremely good
+    - so so perfect
+    - so good
+    - so perfect
 
-  - intent: ask_sentence_types
-    examples: |
-      - what are the types of sentences?
-      - how to categorize sentences?
-      - what are the different forms of sentences?
-      - what kinds of sentences are there?
-      - what are the different kinds of sentences?
-      - what are the best ways to categorize sentences?
-      - how can sentences be classified?
-      - what are the best ways to classify sentences?
-      - how do you categorize sentences?
+- intent: mood_unhappy
+  examples: |
+    - my day was horrible
+    - I am sad
+    - I don't feel very well
+    - I am disappointed
+    - super sad
+    - I'm so sad
+    - sad
+    - very sad
+    - unhappy
+    - not good
+    - not very good
+    - extremly sad
+    - so saad
+    - so sad
 
-  - intent: ask_sentence_types_based_on_structure
-    examples: |
-      - structurally, how many types of sentences are there?
-      - what are the types of sentences based on their structure?
-      - What kinds of sentences are there depending on their structure?
-      - What are the different forms of sentences depending on their structure?
-      - types of sentence by structure
-
-  - intent: ask_sentence_types_based_on_function
-    examples: |
-      - functionally, how many types of sentences are there?
-      - what are the types of sentences based on their functions?
-      - what kinds of functions are there depending on their functions?
-      - what are the different forms of sentences depending on their functions?
-      - types of sentences by functions
-
-  - intent: ask_simple_sentence
-    examples: |
-      - what is a simple sentence?
-      - What exactly is a plain sentence?
-      - What is the definition of a simple sentence?
-      - simple sentence
-      - simple sentence examples
-      - What does it mean to say something in a short sentence?
-      - What is the kind of statement because it only has one clause?
-      - What is the type of sentence that has just one clause?
-      - what makes a sentence simple?
-      - What distinguishes a plain sentence?
-      - What factors contribute to the simplicity of a sentence?
-
-  - intent: ask_compound_sentence
-    examples: |
-      - what is a compound sentence?
-      - What is the meaning of a compound sentence?
-      - What exactly is a compound sentence?
-      - What is the definition of a compound sentence?
-      - compound sentence
-      - compound sentence examples
-      - What is a composite phrase, exactly?
-      - when a sentence has more than one independent clauses, what is the type of it?
-      - What is the kind of statement where it has more than one individual clause?
-      - What is the type of sentence that has more than one clause?
-      - What is the kind of sentence because it contains multiple seperate clauses?
-      - what makes a sentence compound?
-      - What causes a sentence to be compound?
-      - What factors contribute to the formation of a compound sentence?
-
-  - intent: ask_complex_sentence
-    examples: |
-      - what is a complex sentence?
-      - What is a complicated sentence?
-      - What is the definition of a complex sentence?
-      - complex sentence
-      - complex sentence examples
-      - what makes a sentence complex?
-      - What factors contribute to the complexity of a sentence?
-      - What distinguishes a complex sentence?
-      - When a sentence has more than one clause but one of them is an independent clause and the others are dependent clauses, what kind of sentence is that?
-      - Which type of sentence is it when a sentence contains more than one clause, but one of them is an autonomous clause and the rest are contingent clauses?
-      - What kind of sentence is it when there are several clauses in a sentence, but one of them is an autonomous clause and the others are dependent clauses?
-
-  - intent: ask_compound_complex_sentence
-    examples: |
-      - what is a compound complex sentence?
-      - what is a complex compound sentence?
-      - what is the definition of a compound complex sentence?
-      - compound complex sentence
-      - what makes a sentence compound and also complex?
-      - what is a combination of compound sentence and complex sentence
-      - what if a sentence that has at least two independent clauses and at least one dependent clause?
-      - compound complex sentece examples
-
-  - intent: ask_imperative_sentence
-    examples: |
-      - what is an imperative sentence?
-      - when do we use imperative sentence?
-      - What exactly is an imperative sentence?
-      - When can an imperative phrase be used?
-      - what kind of sentence should i use when making a command or request?
-      - what makes a sentence imperative?
-      - imperative sentence examples?
-      - imperative sentence
-
-  - intent: ask_declarative_sentence
-    examples: |
-      - what is an declarative sentence
-      - when do we use declarative sentence?
-      - what kind of sentence should i use when describe a feeling or opinion?
-      - declarative sentence examples
-      - declarative sentence
-      - What distinguishes a declarative sentence?
-
-  - intent: ask_interrogative_sentence
-    examples: |
-      - what is a question called?
-      - what is an interrogative sentence?
-      - when i want to ask something, which kind of sentence should i use?
-      - what makes a sentence interrogative?
-      - what distinguishes a interrogative sentence?
-      - interrogative sentence
-      - interrogative sentence examples
-
-  - intent: ask_exclamatory_sentence
-    examples: |
-      - what is a exclamatory sentence?
-      - what makes a sentence exclamatory?
-      - when i want to express emotions or feelings, what kind of sentence should i use?
-      - exclamatory sentence
-      - exclamatory sentence examples
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
