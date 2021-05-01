@@ -34,11 +34,10 @@ intents:
   - ask_compound_noun
   - ask_pronoun
   - ask_subject_pronoun
-  - None
 
 actions:
   - action_hello_world
-  - utter_fallback_warning
+  - utter_fallback_chat
 
 responses:
   utter_greet:

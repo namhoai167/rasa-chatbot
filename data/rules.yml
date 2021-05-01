@@ -12,12 +12,7 @@ rules:
   - intent: bot_challenge
   - action: utter_iamabot
 
-- rule: Chat with blenderbot when user intent out of scope
-  steps:
-  - intent: None
-  - action: action_hello_world
-
 - rule: Trigger a message whenever they send a message with low NLU confidence
   steps:
   - intent: nlu_fallback
-  - action: utter_fallback_warning
+  - action: utter_fallback_chat
