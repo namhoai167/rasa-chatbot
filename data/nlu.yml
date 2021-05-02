@@ -8,8 +8,6 @@ nlu:
     - hello
     - hi
     - hello there
-    - good morning
-    - good evening
     - moin
     - hey there
     - let's go
@@ -20,7 +18,6 @@ nlu:
     - good day
 - intent: goodbye
   examples: |
-    - good afternoon
     - c u
     - good by
     - cee you later
