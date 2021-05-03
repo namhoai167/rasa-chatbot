@@ -4,9 +4,6 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
-
-# This is a simple example for a custom action which utters "Hello World!"
-
 from fitbert import FitBert
 from transformers import (
     BlenderbotSmallTokenizer, 
@@ -18,11 +15,10 @@ from transformers import (
     pipeline
 )
 from typing import Any, Text, Dict, List
-
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 
-
+# This is a simple example for a custom action which utters "Hello World!"
 class ActionHelloWorld(Action):
 
     def name(self) -> Text:
@@ -38,12 +34,8 @@ class ActionHelloWorld(Action):
 
 class ActionOnFallBack(Action):
 
-    
-    
-    
     def name(self) -> Text:
         return "action_fallback_chat"
-        
         
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
@@ -53,12 +45,12 @@ class ActionOnFallBack(Action):
         BB_PATH = './blenderbot_small-90M'
         BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(BB_PATH)
         BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
+
         latest_user_message = tracker.latest_message['text']
-        dispatcher.utter_message(latest_user_message)
+
         inputs = BBTokenizer([latest_user_message], return_tensors='pt')
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(reply_ids, skip_special_tokens=True)[0]
- 
         dispatcher.utter_message(text=str(bot_reply))
 
         return []
