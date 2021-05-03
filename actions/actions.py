@@ -40,18 +40,18 @@ class ActionOnFallBack(Action):
 
     # Load BlenderBot
     # Maybe put in init function or __init__.py
-    BB_path = './blenderbot_small-90M'
+    BB_PATH = './blenderbot_small-90M'
     BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(BB_PATH)
     BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
     
     def name(self) -> Text:
-        return "utter_fallback_chat"
+        return "action_fallback_chat"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         
-        latest_user_message = tracker.latest_message.['text']
+        latest_user_message = tracker.latest_message['text']
         inputs = BBTokenizer([latest_user_message], return_tensors='pt')
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(reply_ids, skip_special_tokens=True)[0]

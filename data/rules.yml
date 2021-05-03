@@ -15,4 +15,4 @@ rules:
 - rule: Trigger a message whenever they send a message with low NLU confidence
   steps:
   - intent: nlu_fallback
-  - action: utter_fallback_chat
+  - action: action_fallback_chat

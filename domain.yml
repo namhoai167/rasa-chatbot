@@ -21,56 +21,6 @@ intents:
     use_entities: true
 - bot_challenge:
     use_entities: true
-- ask_word:
-    use_entities: true
-- ask_sentence_definition:
-    use_entities: true
-- ask_sentence_types:
-    use_entities: true
-- ask_sentence_types_based_on_structure:
-    use_entities: true
-- ask_sentence_types_based_on_function:
-    use_entities: true
-- ask_simple_sentence:
-    use_entities: true
-- ask_compound_sentence:
-    use_entities: true
-- ask_complex_sentence:
-    use_entities: true
-- ask_compound_complex_sentence:
-    use_entities: true
-- ask_imperative_sentence:
-    use_entities: true
-- ask_declarative_sentence:
-    use_entities: true
-- ask_interrogative_sentence:
-    use_entities: true
-- ask_exclamatory_sentence:
-    use_entities: true
-- ask_part_of_speech:
-    use_entities: true
-- ask_noun:
-    use_entities: true
-- ask_proper_noun:
-    use_entities: true
-- ask_common_noun:
-    use_entities: true
-- ask_abstract_noun:
-    use_entities: true
-- ask_concrete_noun:
-    use_entities: true
-- ask_countable_noun:
-    use_entities: true
-- ask_noncountable_noun:
-    use_entities: true
-- ask_collective_noun:
-    use_entities: true
-- ask_compound_noun:
-    use_entities: true
-- ask_pronoun:
-    use_entities: true
-- ask_subject_pronoun:
-    use_entities: true
 - nlu_fallback:
     use_entities: true
 entities: []
@@ -99,6 +49,6 @@ responses:
   - text: I am a bot, powered by Rasa.
 actions:
 - action_hello_world
-- utter_fallback_chat
+- action_fallback_chat
 forms: {}
 e2e_actions: []
