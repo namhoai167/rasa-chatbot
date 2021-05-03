@@ -38,24 +38,27 @@ class ActionHelloWorld(Action):
 
 class ActionOnFallBack(Action):
 
-    # Load BlenderBot
-    # Maybe put in init function or __init__.py
-    BB_PATH = './blenderbot_small-90M'
-    BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(BB_PATH)
-    BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
+    
+    
     
     def name(self) -> Text:
         return "action_fallback_chat"
-
+        
+        
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        
+        # Load BlenderBot
+        # Maybe put in init function or __init__.py
+        BB_PATH = './blenderbot_small-90M'
+        BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(BB_PATH)
+        BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
         latest_user_message = tracker.latest_message['text']
+        dispatcher.utter_message(latest_user_message)
         inputs = BBTokenizer([latest_user_message], return_tensors='pt')
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(reply_ids, skip_special_tokens=True)[0]
  
-        dispatcher.utter_message(bot_reply)
+        dispatcher.utter_message(text=str(bot_reply))
 
         return []
