@@ -1,6 +1,11 @@
+# other files
+TOEIC_reading.txt
+story_graph.dot
+
 # Weights folders
 models/
 blenderbot_small-90M/
+electra-small-generator/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

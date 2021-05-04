@@ -1,7 +1,6 @@
 version: "2.0"
 
 rules:
-
 - rule: Say goodbye anytime the user says goodbye
   steps:
   - intent: goodbye
@@ -11,6 +10,26 @@ rules:
   steps:
   - intent: bot_challenge
   - action: utter_iamabot
+
+- rule: Store slot for English multiple choice sentence completion form when user request
+  steps:
+  - intent: request_multiple_choice_sentence_completion
+  - action: english_multiple_choice_sentence_completion_form
+  - active_loop: english_multiple_choice_sentence_completion_form
+
+- rule: Submit and solve English multiple choice sentence completion form
+  condition:
+  # Condition that form is active.
+  - active_loop: english_multiple_choice_sentence_completion_form
+  steps:
+  # Form is deactivated
+  - action: english_multiple_choice_sentence_completion_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  # The actions we want to run when the form is submitted.
+  - action: utter_comfirm_sentence_answers_values
+  - action: action_solve_multiple_choice_sentence_completion
 
 - rule: Trigger a message whenever they send a message with low NLU confidence
   steps:

@@ -90,3 +90,11 @@ nlu:
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
+
+- intent: request_multiple_choice_sentence_completion
+  examples: |
+    - can you help me with this multiple choice sentence completion?
+    - please solve this sentence that has one blank spot
+    - give me the answer for this question of TOEIC reading part 5
+    - could you choose the word to complete this sentence
+    - could you choose the phrase that best completes the sentence from four choices

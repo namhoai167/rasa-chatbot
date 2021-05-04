@@ -54,3 +54,28 @@ class ActionOnFallBack(Action):
         dispatcher.utter_message(text=str(bot_reply))
 
         return []
+
+class ActionSolveMulipleChoiceSentenceCompletrion(Action):
+
+    def name(self) -> Text:
+        return "action_solve_multiple_choice_sentence_completion"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        ELECTRA_PATH = './electra-small-generator'
+        ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
+        ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
+        fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
+        sentence_value = tracker.get_slot("sentence")
+        sentence_value = sentence_value.replace('_', '***mask***')
+        answers = [
+            tracker.get_slot("answer_a"),
+            tracker.get_slot("answer_b"), 
+            tracker.get_slot("answer_c"), 
+            tracker.get_slot("answer_d")
+        ]
+        bot_choice = fb.rank(sentence_value, options=answers)[0]
+        dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
+
+        return []
