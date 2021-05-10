@@ -12,7 +12,6 @@ pipeline:
   - name: RegexFeaturizer
   - name: LexicalSyntacticFeaturizer
   - name: CountVectorsFeaturizer
-  - name: CountVectorsFeaturizer
     # Analyzer to use, either 'word', 'char', or 'char_wb'
     analyzer: char_wb
     # Set the lower and upper boundaries for the n-grams
@@ -23,6 +22,14 @@ pipeline:
     # Whether to use a shared vocab
     # use_shared_vocab: False
   - name: DIETClassifier
+    entity_recognition: False
+  - name: RegexEntityExtractor
+    # text will be processed with case insensitive as default
+    case_sensitive: False
+    # use lookup tables to extract entities
+    use_lookup_tables: False
+    # use regexes to extract entities
+    use_regexes: True
     #model_confidence: linear_norm
     epochs: 100
     #constrain_similarities: true
@@ -32,6 +39,7 @@ pipeline:
   - name: FallbackClassifier
     threshold: 0.5
     ambiguity_threshold: 0.1
+
 
 # Configuration for Rasa Core.
 # https://rasa.com/docs/rasa/core/policies/

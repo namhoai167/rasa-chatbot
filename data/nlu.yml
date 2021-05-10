@@ -101,13 +101,13 @@ nlu:
 
 - regex: phrase_to_tracau
   examples: |
-      - \"\w+\"
+      - \"([^\"]*)\"
 
 - intent: request_to_tracau
   examples: |
     - find me the usage of the phrase ["for all"](phrase_to_tracau)
     - help me with the structure ["look forward to"](phrase_to_tracau)
-    - what is the meaning of the phrase ["at all cost"]?(phrase_to_tracau)
+    - what is the meaning of the phrase ["at all cost"](phrase_to_tracau)?
     - what is ["in order to"](phrase_to_tracau) and its meaning?
     - what are some word combination of ["sleep"](phrase_to_tracau)?
     - ["on the dot"](phrase_to_tracau)

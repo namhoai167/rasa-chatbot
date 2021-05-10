@@ -100,10 +100,11 @@ class ActionRequestToTracau(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        query = tracker.latest_message['entities'][0]['entity']
+        query = tracker.latest_message['entities'][-1]['value'].strip('"').strip()
+        #dispatcher.utter_message(text=query)
         url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
-        respond = rq.get(url).json()
         try:
+            respond = rq.get(url).json()
             html = respond['tratu'][0]['fields']['fulltext']
         except:
             lemmatizer = WordNetLemmatizer()
@@ -111,26 +112,21 @@ class ActionRequestToTracau(Action):
             url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
             respond = rq.get(url).json()
             html = respond['tratu'][0]['fields']['fulltext']
-        parsed_html = BeautifulSoup(html)
-        # print(parsed_html.prettify())
-        l = []
+        parsed_html = BeautifulSoup(html, features="lxml")
         if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
-            l = [x for x in parsed_html.find("article", {
-                'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
+            l = [x for x in parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
         elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
-            l = [x for x in parsed_html.find("article", {
-                'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
+            l = [x for x in parsed_html.find("article", {'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
         l2 = []
         for element in l:
             if element.name == 'dtrn':
-                definition_text = element.find(
-                    'dtrn', text=True, recursive=False)
+                definition_text = element.find('dtrn',text=True, recursive=False)
                 l2.append(definition_text)
                 for child in element.children:
                     if child.string:
                         l2.append(child.string)
             else:
                 l2.append(element.getText())
-        dispatcher.utter_message(text='\n'.join(
-            [string for string in l2 if string]))
+
+        dispatcher.utter_message(text='\n'.join([string for string in l2 if string]))
         return []

@@ -11,7 +11,8 @@ intents:
   - bot_challenge
   - request_multiple_choice_sentence_completion
   - request_to_tracau
-
+entities:
+  - phrase_to_tracau
 actions:
   - action_hello_world
   - action_fallback_chat
