@@ -35,3 +35,8 @@ rules:
   steps:
   - intent: nlu_fallback
   - action: action_fallback_chat
+
+- rule: Retrieve phrase then send to TraCau API and get the respond
+  steps:
+    - intent: request_to_tracau
+    - action: action_request_to_tracau

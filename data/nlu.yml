@@ -98,3 +98,17 @@ nlu:
     - give me the answer for this question of TOEIC reading part 5
     - could you choose the word to complete this sentence
     - could you choose the phrase that best completes the sentence from four choices
+
+- regex: phrase_to_tracau
+  examples: |
+      - \"\w+\"
+
+- intent: request_to_tracau
+  examples: |
+    - find me the usage of the phrase ["for all"](phrase_to_tracau)
+    - help me with the structure ["look forward to"](phrase_to_tracau)
+    - what is the meaning of the phrase ["at all cost"]?(phrase_to_tracau)
+    - what is ["in order to"](phrase_to_tracau) and its meaning?
+    - what are some word combination of ["sleep"](phrase_to_tracau)?
+    - ["on the dot"](phrase_to_tracau)
+    - what does it mean to say ["call it a day"](phrase_to_tracau)?

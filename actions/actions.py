@@ -1,4 +1,4 @@
-# This files contains your custom actions which can be used to run
+# This file contains your custom actions which can be used to run
 # custom Python code.
 #
 # See this guide on how to implement these action:
@@ -6,7 +6,7 @@
 
 from fitbert import FitBert
 from transformers import (
-    BlenderbotSmallTokenizer, 
+    BlenderbotSmallTokenizer,
     BlenderbotSmallForConditionalGeneration,
     BlenderbotTokenizer,
     BlenderbotForConditionalGeneration,
@@ -18,6 +18,17 @@ from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 
+import requests as rq
+import nltk
+from nltk.stem import WordNetLemmatizer
+
+nltk.download('wordnet')
+try:
+    from BeautifulSoup import BeautifulSoup
+except ImportError:
+    from bs4 import BeautifulSoup
+
+
 # This is a simple example for a custom action which utters "Hello World!"
 class ActionHelloWorld(Action):
 
@@ -27,16 +38,16 @@ class ActionHelloWorld(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
         dispatcher.utter_message(text="Hello World!")
 
         return []
+
 
 class ActionOnFallBack(Action):
 
     def name(self) -> Text:
         return "action_fallback_chat"
-        
+
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
@@ -55,7 +66,8 @@ class ActionOnFallBack(Action):
 
         return []
 
-class ActionSolveMulipleChoiceSentenceCompletrion(Action):
+
+class ActionSolveMultipleChoiceSentenceCompletion(Action):
 
     def name(self) -> Text:
         return "action_solve_multiple_choice_sentence_completion"
@@ -71,11 +83,54 @@ class ActionSolveMulipleChoiceSentenceCompletrion(Action):
         sentence_value = sentence_value.replace('_', '***mask***')
         answers = [
             tracker.get_slot("answer_a"),
-            tracker.get_slot("answer_b"), 
-            tracker.get_slot("answer_c"), 
+            tracker.get_slot("answer_b"),
+            tracker.get_slot("answer_c"),
             tracker.get_slot("answer_d")
         ]
         bot_choice = fb.rank(sentence_value, options=answers)[0]
         dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
 
+        return []
+
+
+class ActionRequestToTracau(Action):
+    def name(self) -> Text:
+        return "action_request_to_tracau"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        query = tracker.latest_message['entities'][0]['entity']
+        url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
+        respond = rq.get(url).json()
+        try:
+            html = respond['tratu'][0]['fields']['fulltext']
+        except:
+            lemmatizer = WordNetLemmatizer()
+            query = lemmatizer.lemmatize(query)
+            url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
+            respond = rq.get(url).json()
+            html = respond['tratu'][0]['fields']['fulltext']
+        parsed_html = BeautifulSoup(html)
+        # print(parsed_html.prettify())
+        l = []
+        if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
+            l = [x for x in parsed_html.find("article", {
+                'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
+        elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
+            l = [x for x in parsed_html.find("article", {
+                'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
+        l2 = []
+        for element in l:
+            if element.name == 'dtrn':
+                definition_text = element.find(
+                    'dtrn', text=True, recursive=False)
+                l2.append(definition_text)
+                for child in element.children:
+                    if child.string:
+                        l2.append(child.string)
+            else:
+                l2.append(element.getText())
+        dispatcher.utter_message(text='\n'.join(
+            [string for string in l2 if string]))
         return []

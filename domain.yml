@@ -10,11 +10,13 @@ intents:
   - mood_unhappy
   - bot_challenge
   - request_multiple_choice_sentence_completion
+  - request_to_tracau
 
 actions:
   - action_hello_world
   - action_fallback_chat
   - action_solve_multiple_choice_sentence_completion
+  - action_request_to_tracau
 
 responses:
   utter_greet:
