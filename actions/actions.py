@@ -117,6 +117,11 @@ class ActionRequestToTracau(Action):
             l = [x for x in parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
         elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
             l = [x for x in parsed_html.find("article", {'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
+        elif parsed_html.find("article", {'data-tab-name': "Anh - Anh"}):
+            l = [x for x in parsed_html.find("article", {'data-tab-name': "Anh - Anh"}).find("div", {'class': "dict--content"}).children]
+        else:
+            dispatcher.utter_message(text="Sorry, I can't find the phrase {0} in the database".format(query))
+            return []
         l2 = []
         for element in l:
             if element.name == 'dtrn':
