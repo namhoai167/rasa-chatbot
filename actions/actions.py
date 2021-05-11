@@ -18,10 +18,7 @@ from transformers import (
     pipeline
 )
 import requests as rq
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 import nltk
 from nltk.stem import WordNetLemmatizer
 nltk.download('wordnet')
@@ -115,7 +112,7 @@ class ActionRequestToTracau(Action):
             url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
             respond = rq.get(url).json()
             html = respond['tratu'][0]['fields']['fulltext']
-        parsed_html = BeautifulSoup(html, features="lxml")
+        parsed_html = BeautifulSoup(html)
         if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
             l = [x for x in parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
         elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
