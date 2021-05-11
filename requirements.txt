@@ -1,0 +1,9 @@
+python==3.8.5
+rasa==2.5.1
+fitbert==0.9.0
+transformers==4.3.3
+nltk==3.6.2
+spacy==3.0.6
+https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.0.0/en_core_web_md-3.0.0.tar.gz#egg=en_core_web_md
+requests=2.25.1
+beautifulsoup4==4.9.3

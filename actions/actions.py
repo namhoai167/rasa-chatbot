@@ -4,30 +4,27 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
+from typing import Any, Text, Dict, List
+from rasa_sdk import Action, Tracker
+from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.events import SlotSet
+
 from fitbert import FitBert
 from transformers import (
     BlenderbotSmallTokenizer,
     BlenderbotSmallForConditionalGeneration,
-    BlenderbotTokenizer,
-    BlenderbotForConditionalGeneration,
     ElectraForMaskedLM,
     ElectraTokenizer,
     pipeline
 )
-from typing import Any, Text, Dict, List
-from rasa_sdk import Action, Tracker
-from rasa_sdk.executor import CollectingDispatcher
-
 import requests as rq
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    from BeautifulSoup import BeautifulSoup
 import nltk
 from nltk.stem import WordNetLemmatizer
-
 nltk.download('wordnet')
-try:
-    from BeautifulSoup import BeautifulSoup
-except ImportError:
-    from bs4 import BeautifulSoup
-
 
 # This is a simple example for a custom action which utters "Hello World!"
 class ActionHelloWorld(Action):
@@ -52,7 +49,7 @@ class ActionOnFallBack(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # Load BlenderBot
-        # Maybe put in init function or __init__.py
+        # Maybe we shoul put this in init function or __init__.py later on
         BB_PATH = './blenderbot_small-90M'
         BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(BB_PATH)
         BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
@@ -90,7 +87,13 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         bot_choice = fb.rank(sentence_value, options=answers)[0]
         dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
 
-        return []
+        return [
+            SlotSet("sentence", None),
+            SlotSet("answer_a", None),
+            SlotSet("answer_b", None),
+            SlotSet("answer_c", None),
+            SlotSet("answer_d", None)
+        ]
 
 
 class ActionRequestToTracau(Action):
