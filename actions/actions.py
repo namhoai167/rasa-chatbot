@@ -46,7 +46,7 @@ class ActionOnFallBack(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # Load BlenderBot
-        # Maybe we shoul put this in init function or __init__.py later on
+        # Maybe we should put this in init function or __init__.py later on
         BB_PATH = './blenderbot_small-90M'
         BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(BB_PATH)
         BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
