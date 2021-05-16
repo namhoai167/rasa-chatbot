@@ -31,3 +31,8 @@ rules:
   steps:
     - intent: request_to_tracau
     - action: action_request_to_tracau
+
+- rule: Retrieve text then correct using both LanguageTool and Gingerit
+  steps:
+    - intent: writing_check
+    - action: action_writing_check

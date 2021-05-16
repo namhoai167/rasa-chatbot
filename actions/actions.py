@@ -21,8 +21,11 @@ import requests as rq
 from bs4 import BeautifulSoup
 import nltk
 from nltk.stem import WordNetLemmatizer
+from nltk import tokenize
 nltk.download('wordnet')
-
+nltk.download('punkt')
+import language_tool_python
+from gingerit.gingerit import GingerIt
 
 class ActionOnFallBack(Action):
 
@@ -127,4 +130,62 @@ class ActionRequestToTracau(Action):
 
         dispatcher.utter_message(text='\n'.join(
             [string for string in l2 if string]))
+        return []
+
+
+def cut_paragraph(text, maximum_len=300):
+    sentences = tokenize.sent_tokenize(text)
+    len_for_each_sentence = [len(sentence) for sentence in sentences]
+    splited_paragraph = []
+    while len(sentences) > 0:
+        current_len = 0
+        for i in range(len(sentences)):
+            current_len += len_for_each_sentence[i] + 1
+            if current_len > maximum_len:
+                splited_paragraph.append(" ".join([sentence for idx, sentence in enumerate(sentences) if idx < i]))
+                del sentences[:i]
+                del len_for_each_sentence[:i]
+                break
+            if i == len(sentences) - 1:
+                splited_paragraph.append(" ".join([sentence for sentence in sentences]))
+                return splited_paragraph
+            
+            
+def split_into_sentences(text, string=True):
+    sentences = tokenize.sent_tokenize(text)
+    if string:
+        return "\n\n".join(sentences)
+    return sentences
+
+
+def correct_gingerit(text, gg):
+    splited_text = cut_paragraph(text)
+    return split_into_sentences(" ".join([gg.parse(t)['result'] for t in splited_text]))
+
+
+def correct_language_tool(text, language_tool):
+    return(split_into_sentences(language_tool.correct(text)))
+
+
+
+class ActionWritingCheck(Action):
+    def name(self) -> Text:
+        return "action_writing_check"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
+        language_tool = language_tool_python.LanguageTool('en-US')
+        gg = GingerIt()
+        text = tracker.latest_message['entities'][0]['value'].strip(
+            '"').strip()
+        message = f"Here are two versions of your text after correction:\n\n"
+        message = message + "------------\n\n"
+        message = message + correct_language_tool(text, language_tool) + "\n\n"
+        message = message + "------------\n\n"
+        message = message + correct_gingerit(text, gg) + "\n\n"
+        message = message + "------------\n\n"
+        message = message + "Please keep in mind that these corrections may be wrong and should only be used as a preference"
+        dispatcher.utter_message(message)
         return []
