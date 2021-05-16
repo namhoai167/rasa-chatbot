@@ -11,8 +11,11 @@ intents:
     use_entities: true
 - nlu_fallback:
     use_entities: false
+- writing_check:
+    use_entities: true
 entities:
 - phrase_to_tracau
+- text
 slots:
   sentence:
     type: rasa.shared.core.slots.TextSlot
@@ -61,6 +64,7 @@ actions:
 - action_fallback_chat
 - action_solve_multiple_choice_sentence_completion
 - action_request_to_tracau
+- action_writing_check
 forms:
   english_multiple_choice_sentence_completion_form:
     required_slots:
