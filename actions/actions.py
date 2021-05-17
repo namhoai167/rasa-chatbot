@@ -18,6 +18,7 @@ from transformers import (
     pipeline
 )
 import requests as rq
+import numpy as np
 from bs4 import BeautifulSoup
 import nltk
 from nltk.stem import WordNetLemmatizer
@@ -154,7 +155,7 @@ def cut_paragraph(text, maximum_len=300):
 def split_into_sentences(text, string=True):
     sentences = tokenize.sent_tokenize(text)
     if string:
-        return "\n\n".join(sentences)
+        return "\n".join(sentences)
     return sentences
 
 
@@ -167,6 +168,66 @@ def correct_language_tool(text, language_tool):
     return(split_into_sentences(language_tool.correct(text)))
 
 
+def get(l, idx=0, ret_when_error=''):
+    try:
+        return l[idx]
+    except:
+        return ret_when_error
+    
+def remove_duplicates(error_list):
+    error_list = list(error_list)
+    error_list = np.array(error_list)
+    new_array = np.empty(shape=(0,error_list.shape[1]))
+    for error in error_list:
+        if error[1] not in new_array[:, 1]:
+            new_array = np.vstack([new_array, error])
+        else:
+            if int(error[2]) == int(new_array[np.where(new_array[:,1] == error[1])][0, 2]):
+                new_array[np.where(new_array[:,1] == error[1])[0][0], 0] += " / " + error[0]
+            elif int(error[2]) > int(new_array[np.where(new_array[:,1] == error[1])][0, 2]):
+                new_array[np.where(new_array[:,1] == error[1])[0][0]:] = error
+    return new_array.tolist()
+
+def print_errors(text, language_tool, gg):
+    text = split_into_sentences(text)
+    sub_texts = cut_paragraph(text)
+
+    # This will be list of sets, each item of a set is a tuple which is (correct_word, start_idx, end_idx)
+    unified_errors = []
+
+    # Make unified_language_tool_errors
+    language_tool_errors = [language_tool.check(t) for t in sub_texts]
+    unified_language_tool_errors = []
+    for subtext_language_tool_errors in language_tool_errors:
+        unified_language_tool_errors.append(set((get(error.replacements), error.offset, error.offset+error.errorLength-1) for error in subtext_language_tool_errors))
+    #print(unified_language_tool_errors)
+    #print('\n')
+
+    # Make unified_gg_errors
+    unified_gg_errors = []
+    gg_errors = [gg.parse(t)['corrections'] for t in sub_texts]
+    for subtext_gg_errors in gg_errors:
+        unified_gg_errors.append(set((error['correct'], error['start'], error['end']) for error in subtext_gg_errors))
+    #print(unified_gg_errors)
+    #print('\n')
+    # Merge two lists of sets (union)
+    for language_tool_set, gg_set in zip(unified_language_tool_errors, unified_gg_errors):
+        unified_errors.append(language_tool_set | gg_set)
+    #print(unified_errors)
+    #print('\n')
+    # Handle duplicate or colided errors
+    unified_errors = [remove_duplicates(error_list) for error_list in unified_errors]
+    #print(unified_errors)
+    #print('\n')
+    for idx, subtext_errors in enumerate(unified_errors):
+        for error in sorted(subtext_errors,key=lambda x: int(x[1]), reverse=True):
+            start_idx = int(error[1])
+            end_idx = int(error[2])
+            if error[0] == '':
+                sub_texts[idx] = sub_texts[idx][:start_idx] + "{" + sub_texts[idx][start_idx:end_idx + 1] + "}" + """ (This may have a semantic error)""" + sub_texts[idx][end_idx+1:]
+            else:
+                sub_texts[idx] = sub_texts[idx][:start_idx] + "{" + sub_texts[idx][start_idx:end_idx + 1] + "}" + """ (Did you mean: {0})""".format(error[0]) + sub_texts[idx][end_idx+1:]
+    return split_into_sentences(" ".join(sub_texts))
 
 class ActionWritingCheck(Action):
     def name(self) -> Text:
@@ -176,15 +237,18 @@ class ActionWritingCheck(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
+        # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
         language_tool = language_tool_python.LanguageTool('en-US')
         gg = GingerIt()
         text = tracker.latest_message['entities'][0]['value'].strip(
             '"').strip()
-        message = f"Here are two versions of your text after correction:\n\n"
+        message = f'Here are some mistakes that I found:\n\n'
         message = message + "------------\n\n"
-        message = message + correct_language_tool(text, language_tool) + "\n\n"
+        message = message + print_errors(text, language_tool, gg) + '\n\n'
         message = message + "------------\n\n"
-        message = message + correct_gingerit(text, gg) + "\n\n"
+        message = message + f"Here is the text after correction:\n\n"
+        message = message + "------------\n\n"
+        message = message + correct_gingerit(correct_language_tool(text, language_tool), gg) + "\n\n"
         message = message + "------------\n\n"
         message = message + "Please keep in mind that these corrections may be wrong and should only be used as a preference"
         dispatcher.utter_message(message)
