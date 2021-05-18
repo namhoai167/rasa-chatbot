@@ -10,9 +10,14 @@ intents:
   - mood_unhappy
   - bot_challenge
   - request_multiple_choice_sentence_completion
+  - request_multiple_choice_sentence_completion_with_question
   - request_to_tracau
+  - writing_check
+  - nlu_fallback
 entities:
   - phrase_to_tracau
+  - sentence
+  - text
 actions:
   - action_hello_world
   - action_fallback_chat
@@ -52,7 +57,7 @@ responses:
   utter_ask_answer_d:
     - text: "And finally the answer D."
   utter_comfirm_sentence_answers_values:
-    - text: "Your sentence: \"{sentence}\" & 4 answers: \"{answer_a}\", \"{answer_b}\", \"{answer_c}\", \"{answer_d}\""
+    - text: 'Your sentence: "{sentence}" & 4 answers: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
 
 forms:
   english_multiple_choice_sentence_completion_form:
@@ -78,6 +83,8 @@ slots:
     type: text
   answer_d:
     type: text
+  answers:
+    type: list
 
 session_config:
   session_expiration_time: 60

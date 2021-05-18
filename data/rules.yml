@@ -31,6 +31,20 @@ rules:
   - action: utter_comfirm_sentence_answers_values
   - action: action_solve_multiple_choice_sentence_completion
 
+- rule: Submit and solve English multiple choice sentence completion form with question
+  condition:
+  # Condition that form is active.
+  - active_loop: english_multiple_choice_sentence_completion_form_with_question
+  steps:
+  # Form is deactivated
+  - action: english_multiple_choice_sentence_completion_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  # The actions we want to run when the form is submitted.
+  - action: utter_comfirm_sentence_answers_values
+  - action: action_solve_multiple_choice_sentence_completion
+
 - rule: Trigger a message whenever they send a message with low NLU confidence
   steps:
   - intent: nlu_fallback

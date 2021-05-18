@@ -2,6 +2,12 @@
 TOEIC_reading.txt
 story_graph.dot
 
+# Rasa X files
+events.db
+events.db-shm
+events.db-wal
+rasa.db
+
 # Weights folders
 models/
 blenderbot_small-90M/
@@ -115,6 +121,7 @@ celerybeat.pid
 
 # Environments
 # .env
+rasa_venv/
 .env/
 .venv/
 env/
