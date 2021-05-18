@@ -1,15 +1,6 @@
 version: "2.0"
 
 rules:
-- rule: Say goodbye anytime the user says goodbye
-  steps:
-  - intent: goodbye
-  - action: utter_goodbye
-
-- rule: Say 'I am a bot' anytime the user challenges
-  steps:
-  - intent: bot_challenge
-  - action: utter_iamabot
 
 - rule: Store slot for English multiple choice sentence completion form when user request
   steps:
@@ -40,3 +31,8 @@ rules:
   steps:
     - intent: request_to_tracau
     - action: action_request_to_tracau
+
+- rule: Retrieve text then correct using both LanguageTool and Gingerit
+  steps:
+    - intent: writing_check
+    - action: action_writing_check

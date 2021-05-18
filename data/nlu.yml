@@ -1,114 +1,306 @@
 version: "2.0"
 
 nlu:
-- intent: greet
-  examples: |
-    - hey
-    - hallo
-    - hello
-    - hi
-    - hello there
-    - moin
-    - hey there
-    - let's go
-    - hey dude
-    - good morning
-    - good evening
-    - good afternoon
-    - good day
-- intent: goodbye
-  examples: |
-    - c u
-    - good by
-    - cee you later
-    - good night
-    - bye
-    - goodbye
-    - have a nice day
-    - see you around
-    - bye bye
-    - see you later
-    - have a great day
-- intent: thank
-  examples: |
-    - thanks
-    - thanhk you
-    - tks
-- intent: affirm
-  examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
-- intent: deny
-  examples: |
-    - no
-    - n
-    - nah
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
-- intent: mood_great
-  examples: |
-    - perfect
-    - great
-    - amazing
-    - feeling like a king
-    - wonderful
-    - I am feeling very good
-    - I am great
-    - I am amazing
-    - I am going to save the world
-    - super stoked
-    - extremely good
-    - so so perfect
-    - so good
-    - so perfect
-- intent: mood_unhappy
-  examples: |
-    - my day was horrible
-    - I am sad
-    - I don't feel very well
-    - I am disappointed
-    - super sad
-    - I'm so sad
-    - sad
-    - very sad
-    - unhappy
-    - not good
-    - not very good
-    - extremly sad
-    - so saad
-    - so sad
-- intent: bot_challenge
-  examples: |
-    - are you a bot?
-    - are you a human?
-    - am I talking to a bot?
-    - am I talking to a human?
+  - intent: request_multiple_choice_sentence_completion
+    examples: |
+      - can you help me with this multiple choice sentence completion?
+      - please solve this sentence that has one blank spot
+      - give me the answer for this question of TOEIC reading part 5
+      - could you choose the word to complete this sentence
+      - could you choose the phrase that best completes the sentence from four choices
 
-- intent: request_multiple_choice_sentence_completion
-  examples: |
-    - can you help me with this multiple choice sentence completion?
-    - please solve this sentence that has one blank spot
-    - give me the answer for this question of TOEIC reading part 5
-    - could you choose the word to complete this sentence
-    - could you choose the phrase that best completes the sentence from four choices
-
-- regex: phrase_to_tracau
-  examples: |
+  - regex: phrase_to_tracau
+    examples: |
       - \"([^\"]*)\"
+      - \'([^\"]*)\'
+      - \(([^\"]*)\)
+      - \[([^\"]*)\]
 
-- intent: request_to_tracau
-  examples: |
-    - find me the usage of the phrase ["for all"](phrase_to_tracau)
-    - help me with the structure ["look forward to"](phrase_to_tracau)
-    - what is the meaning of the phrase ["at all cost"](phrase_to_tracau)?
-    - what is ["in order to"](phrase_to_tracau) and its meaning?
-    - what are some word combination of ["sleep"](phrase_to_tracau)?
-    - ["on the dot"](phrase_to_tracau)
-    - what does it mean to say ["call it a day"](phrase_to_tracau)?
+  - intent: request_to_tracau
+    examples: |
+      - find me the usage of the phrase ["for all"](phrase_to_tracau)
+      - help me with the structure ["look forward to"](phrase_to_tracau)
+      - what is the meaning of the phrase ["at all cost"](phrase_to_tracau)?
+      - what is ["in order to"](phrase_to_tracau) and its meaning?
+      - what are some word combination of ["sleep"](phrase_to_tracau)?
+      - what is ["on the dot"](phrase_to_tracau)
+      - what does it mean to say ["call it a day"](phrase_to_tracau)?
+      - find the phrase's usage for me: ["for all"](phrase_to_tracau)
+      - assist me with the structure ["at all cost"](phrase_to_tracau).
+      - What exactly does the phrase ["sleep"](phrase_to_tracau) mean?
+      - What are some examples of ["on the dot"](phrase_to_tracau) word combinations?
+
+  - regex: text
+    examples: |
+      - \"(.*)\"
+      - \'(.*)\'
+      - \[(.*)\]
+
+  - intent: writing_check
+    examples: |
+      - Can u check the grammar and spelling of this text for me: ["LanguageTool is your intelligent writing assistant for all common browsers and word processors. Write or paste your text here too have it checked continuously. Errors will be underlined in different colours: we will mark seplling errors with red underilnes. Furthermore grammar error's are highlighted in yellow. LanguageTool also marks style issues in a reliable manner by underlining them in blue. did you know that you can sea synonyms by double clicking a word? Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007."](text)
+      - Analyse this text: [(Dear Jane, I was delighted to read your lettered last week. It's always a pleasure to receive the latest news and to hear that you and your family had a great summer. We spent last week at the beach and had so much fun on the sand and in the water exploring the coast we weren't prepared for the rains that came at the end of the vacation. The best parts of the trip was the opportunities to sightseer and relax. My kids are back in school to. I find there are fewer things to worry. Thanks again for your letter! Sincerely, Karen)](text)
+      - Fix this paragraph for me [[Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.]](text)
+      - find mistakes in my essay ["Envirionment In order to increase the consumption of the tins with conscious of public opinion, Simsek Ambalaj believes in competing with quality to be the products of highquality and precise on the shelves. Only in this condition, the tendency to the alternative packaging solutions will decrease and sources of the country will be used more economical and productive because of the quick recycling of steel packages"](text)
+      - assist me with this paragraph: ["Envirionment In order to increase the consumption of the tins with conscious of public opinion, Simsek Ambalaj believes in competing with quality to be the products of highquality and precise on the shelves. Only in this condition, the tendency to the alternative packaging solutions will decrease and sources of the country will be used more economical and productive because of the quick recycling of steel packages"](text)
+      - help me with this writing homework ["LanguageTool is your intelligent writing assistant for all common browsers and word processors. Write or paste your text here too have it checked continuously. Errors will be underlined in different colours: we will mark seplling errors with red underilnes. Furthermore grammar error's are highlighted in yellow. LanguageTool also marks style issues in a reliable manner by underlining them in blue. did you know that you can sea synonyms by double clicking a word? Its a impressively versatile tool, e.g. if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007."](text)
+
+  - intent: nlu_fallback
+    examples: |
+      - How did you come into being?
+      - How did you come to be?
+      - How exactly were you devised?
+      - How exactly were you made?
+      - How were you built?
+      - How were you conceived?
+      - How were you constructed?
+      - How were you devised?
+      - How were you formed?
+      - How were you made into who you are?
+      - How were you made?
+      - How were you materialized?
+      - How were you set up?
+      - I want to know how you were formed
+      - I'd like to know how you were created
+      - I'd like to know how you were put together?
+      - In what manner were you built?
+      - In what manner were you constructed?
+      - In what manner were you formed?
+      - In what way were you created?
+      - In what way were you formed?
+      - In what way were you made?
+      - In what way were you shaped?
+      - In which manner were you devised?
+      - Let me know how you were made exactly
+      - Specify how you were created?
+      - Tell me how you were made?
+      - What process was used to build you?
+      - What process was used to create you?
+      - What was the process for making you?
+      - You originated through what means?
+      - how have you been built?
+      - how were you made?
+      - in what way were you made?
+      - so how were you made?
+      - what are you made of
+      - Ahoy matey how are you?
+      - Are you ok?
+      - Do you feel good?
+      - Do you have a great day?
+      - HI Sara, what are you up to?
+      - Hi Sara! How are you?
+      - How are You?
+      - How are things?
+      - How are you
+      - How's life treating you friend?
+      - How've you been?
+      - Hows it going
+      - I'm fine and you
+      - Is everything ok?
+      - What's going on?
+      - What's new?
+      - What's up
+      - What's up man
+      - and you
+      - are you alright
+      - are you happy
+      - are you having a good day
+      - are you ok
+      - are you okay
+      - h r u ?
+      - hello, how are you?
+      - hey how are you?
+      - hi how are you?
+      - hi how u doing
+      - hi sara, how are you?
+      - how ?
+      - how are things going
+      - how are things with you?
+      - how are u
+      - how are u?
+      - how are you doing?
+      - how have you been
+      - how is it going
+      - how is your day
+      - how is your day going
+      - how is your evening
+      - how r u
+      - how r u ?
+      - how r u>
+      - how's it going?
+      - how's life
+      - how's life been treating you?
+      - how's your day going
+      - howareyou
+      - hw r u?
+      - is everything all right
+      - is everything okay
+      - nah, I'm good - how are you doing?
+      - okay hi how are you?
+      - wassup>
+      - what about your day
+      - what are you up to?
+      - what's good
+      - whatchcha doing
+      - whatchya upto ?
+      - whats goin on
+      - whats new
+      - whatsapp
+      - yow are you
+      - Do you have friends the same age as you, if so, how old are they?
+      - How long have you been alive?
+      - How long have you been around?
+      - How long have you occupied the earth?
+      - How many candles were on your last birthday cake?
+      - How many years have you been alive?
+      - What is your birthdate?
+      - What is your count of years being alive so far?
+      - What was your age on your last birthday?
+      - do you know how old you are?
+      - give me your age?
+      - how about your age
+      - how aold are you
+      - how many ages?
+      - how many years old are you?
+      - how old are u
+      - how old are you
+      - how old are you?
+      - how old were you on your last birthday?
+      - what number represents your age?
+      - what year were you born?
+      - what's your age?
+      - whats your age?
+      - whats your birth year?
+      - when is your birthday?
+      - when were you born?
+      - when you were bon
+      - Are you the bot?
+      - Hi there, are you the bot?
+      - are you a BOT
+      - are you a robot
+      - are you ai
+      - are you artificial
+      - are you artificial intelligence
+      - are you bot
+      - are you sure that you're a bot?
+      - bot?
+      - What can I ask you?
+      - What can I do?
+      - What can you demo
+      - What can you tell me?
+      - What do you do
+      - anything els
+      - are there any other options?
+      - can I ask you anything else?
+      - can you do anything else?
+      - can you help me
+      - can you help me?
+      - come back
+      - cool! can I do something else here?
+      - hello what can you do for me
+      - help
+      - help me
+      - i need help
+      - more info
+      - now what?
+      - options
+      - show me the menu
+      - show me what's possible
+      - so now what
+      - so what can you do
+      - so what can you do?
+      - so what can you help me with?
+      - so what next?
+      - talk to me
+      - talk to me!
+      - tell me something you can do
+      - tell me what's your skill
+      - um what now
+      - what are all the things you understand?
+      - what are the options?
+      - what are you ding
+      - what are you doing
+      - what are you good at?
+      - What location are you from?
+      - What state were you born in?
+      - What's the name of the place you came from?
+      - Where are you located?
+      - Where are you?
+      - Where are your origins?
+      - Where are your roots?
+      - Where did you come from?
+      - Where did you grow up?
+      - Where did you originate?
+      - Where do you come from?
+      - Where do you consider home?
+      - Where do you live?
+      - Where from?
+      - Where might you be from?
+      - Where were you at before you were here?
+      - Where were you born?
+      - You live around here?
+      - You were conceived in what location?
+      - are you from around here?
+      - what country are you from?
+      - where are from
+      - who are you?
+      - who are u
+      - who r u
+      - who is this
+      - tell me who you are
+      - what is your name
+      - hi what is your name?
+      - what is your name?
+      - what are you?
+      - what is ur name
+      - what I can call you
+      - your name?
+      - tell me your name
+      - what's your name
+      - what is you name
+      - what is you name and where are you from
+      - I am asking you an out of scope question
+      - 4 + 2 = ?
+      - After registration I see that I have an available balance of 0.00000000. What does this balance represent?
+      - Are you ready?
+      - But you're an english site :(
+      - Can I ask you questions first?
+      - Can I die
+      - Can I get a hamburger?
+      - I am hungry
+      - I am trying to build one, and did some research before, but I have not do hand-on work yet
+      - I want to die
+      - I want to order pizza
+      - I want to use pipe
+      - I will check
+      - Is this Goal-Oriented Chatbot?
+      - Is today saturday?
+      - Mail me the guide
+      - Make me a sandwich
+      - NLW
+      - Nice name
+      - Now?
+      - Pizza bot
+      - Recharge
+      - SEL ME SOMETHING
+      - The Try it out is not working
+      - The weather is good
+      - Today
+      - better than you
+      - call me father
+      - can you help me with your docs
+      - kiss me
+      - you have to
+      - what type of bot?
+      - sfasd
+      - asdkjasdhjkasd
+      - j  bhbhj
+      - eshdtjfjfyk
+      - drhdtjfjfyj
+      - sudo reboot
+      - asdfgasd
+      - asdfgasdas
+      - who is Joe Biden?
+      - tell me a joke.
+      - who is the most tallest in the world
+      - who is me?
