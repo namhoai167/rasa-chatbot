@@ -1,5 +1,9 @@
-version: "2.0"
-
+version: '2.0'
+config:
+  store_entities_as_slots: true
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
 intents:
   - greet
   - goodbye
@@ -25,51 +29,31 @@ actions:
   - action_request_to_tracau
 
 responses:
-  utter_greet:
-    - text: "Hey! How are you?"
-  utter_thank:
-    - text: "You're welcome."
-    - text: "You are welcome."
-    - text: "No problem."
-    - text: "My pleasure."
-    - text: "It’s my pleasure."
-    - text: "Glad to help."
-    - text: "Sure!"
-  utter_cheer_up:
-    - text: "Here is something to cheer you up:"
-      image: "https://i.imgur.com/nGF1K8f.jpg"
-  utter_did_that_help:
-    - text: "Did that help you?"
-  utter_happy:
-    - text: "Great, carry on!"
-  utter_goodbye:
-    - text: "Bye"
-  utter_iamabot:
-    - text: "I am a bot, powered by Rasa."
   utter_ask_sentence:
-    - text: "Please give me the sentence for completion"
+  - text: Please give me the sentence for completion
   utter_ask_answer_a:
-    - text: "Now please give me the answer A."
+  - text: Now please give me the answer A.
   utter_ask_answer_b:
-    - text: "Now please, the answer B."
+  - text: Now please, the answer B.
   utter_ask_answer_c:
-    - text: "Next please the answer C."
+  - text: Next please the answer C.
   utter_ask_answer_d:
-    - text: "And finally the answer D."
+  - text: And finally the answer D.
   utter_comfirm_sentence_answers_values:
     - text: 'Your sentence: "{sentence}" & 4 answers: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
 
 forms:
   english_multiple_choice_sentence_completion_form:
-    sentence:
+    required_slots:
+      answer_a:
       - type: from_text
-    answer_a:
+      answer_b:
       - type: from_text
-    answer_b:
+      answer_c:
       - type: from_text
-    answer_c:
+      answer_d:
       - type: from_text
-    answer_d:
+      sentence:
       - type: from_text
 
 slots:
