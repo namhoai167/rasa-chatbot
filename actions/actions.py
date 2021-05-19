@@ -54,10 +54,10 @@ def cut_paragraph(text, maximum_len=300):
                 return splited_paragraph
 
 
-def split_into_sentences(text, string=True):
+def split_into_sentences(text, string=True, joiner='\n'):
     sentences = tokenize.sent_tokenize(text)
     if string:
-        return "\n".join(sentences)
+        return joiner.join(sentences)
     return sentences
 
 
@@ -161,7 +161,7 @@ class ActionOnFallBack(Action):
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(
             reply_ids, skip_special_tokens=True)[0]
-        bot_reply = str(bot_reply).capitalize()
+        bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(str(bot_reply), string=False)])
         if latest_user_message.casefold() != correction.casefold():
             bot_reply = bot_reply + "\n(Small note: I found some mistakes in your message! Did you mean \"{0}\"?)".format(correction)
         dispatcher.utter_message(text=bot_reply)
