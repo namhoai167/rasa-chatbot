@@ -163,7 +163,7 @@ class ActionOnFallBack(Action):
             reply_ids, skip_special_tokens=True)[0]
         bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(str(bot_reply), string=False)])
         if latest_user_message.casefold() != correction.casefold():
-            bot_reply = bot_reply + "\n(Small note: I found some mistakes in your message! Did you mean \"{0}\"?)".format(correction)
+            bot_reply = bot_reply + "\n \nSmall note: I found some mistakes in your message! Did you mean \"{0}\"?".format(correction)
         dispatcher.utter_message(text=bot_reply)
         return []
 
@@ -267,7 +267,7 @@ class ActionRequestToTracau(Action):
             url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
             respond = rq.get(url).json()
             html = respond['tratu'][0]['fields']['fulltext']
-        parsed_html = BeautifulSoup(html)
+        parsed_html = BeautifulSoup(html, features="lxml")
         if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
             l = [x for x in parsed_html.find("article", {
                                              'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
@@ -309,16 +309,16 @@ class ActionWritingCheck(Action):
         # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
         text = tracker.latest_message['entities'][0]['value'].strip(
             '"').strip()
-        message = f'Here are some mistakes that I found:\n\n'
+        message = f'Here are some mistakes that I found:\n'
         message = message + "------------\n\n"
-        message = message + print_errors(text, language_tool, gg) + '\n\n'
-        message = message + "------------\n\n"
-        message = message + f"Here is the text after correction:\n\n"
-        message = message + "------------\n\n"
+        message = message + print_errors(text, language_tool, gg) + '\n'
+        message = message + "------------\n \n"
+        message = message + f"Here is the text after correction:\n"
+        message = message + "------------\n"
         message = message + \
             correct_gingerit(correct_language_tool(
-                text, language_tool), gg) + "\n\n"
-        message = message + "------------\n\n"
+                text, language_tool), gg) + "\n"
+        message = message + "------------\n"
         message = message + "Please keep in mind that these corrections may be wrong and should only be used as a preference"
         dispatcher.utter_message(message)
         return []
