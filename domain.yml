@@ -1,9 +1,5 @@
-version: '2.0'
-config:
-  store_entities_as_slots: true
-session_config:
-  session_expiration_time: 60
-  carry_over_slots_to_new_session: true
+version: "2.0"
+
 intents:
   - greet
   - goodbye
@@ -14,23 +10,28 @@ intents:
   - mood_unhappy
   - bot_challenge
   - request_multiple_choice_sentence_completion
-  - request_multiple_choice_sentence_completion_with_question
+  - request_multiple_choice_sentence_completion_with_list_of_sentence_and_answers
+  - reply_with_multiple_choice
   - request_to_tracau
   - writing_check
   - nlu_fallback
 entities:
   - phrase_to_tracau
-  - sentence
   - text
+  # - sentence
+  - answers
+  - sentence_and_answers
 actions:
   - action_hello_world
   - action_fallback_chat
   - action_solve_multiple_choice_sentence_completion
+  - action_solve_multiple_choice_sentence_completion_with_list_of_answers
+  - action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_answers
   - action_request_to_tracau
 
 responses:
   utter_ask_sentence:
-  - text: Please give me the sentence for completion
+  - text: Please give me the incomplete sentence.
   utter_ask_answer_a:
   - text: Now please give me the answer A.
   utter_ask_answer_b:
@@ -39,9 +40,13 @@ responses:
   - text: Next please the answer C.
   utter_ask_answer_d:
   - text: And finally the answer D.
+  utter_ask_answers:
+  - text: Now please give me at least 2 possible choices.
+  utter_ask_sentence_and_answers:
+  - text: Please give me the incomplete sentence and at least 2 possible choices.
   utter_comfirm_sentence_answers_values:
     - text: 'Your sentence: "{sentence}" & 4 answers: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
-
+  
 forms:
   english_multiple_choice_sentence_completion_form:
     required_slots:
@@ -55,7 +60,19 @@ forms:
       - type: from_text
       sentence:
       - type: from_text
-
+  english_multiple_choice_sentence_completion_with_list_of_answers_form:
+    required_slots:
+      sentence:
+      - type: from_text
+      answers:
+      - type: from_entity
+        entity: answers
+  english_multiple_choice_sentence_completion_with_list_of_sentence_and_answers_form:
+    required_slots:
+      sentence_and_answers:
+      - type: from_entity
+        entity: sentence_and_answers
+      
 slots:
   sentence:
     type: text
@@ -68,6 +85,8 @@ slots:
   answer_d:
     type: text
   answers:
+    type: list
+  sentence_and_answers:
     type: list
 
 session_config:

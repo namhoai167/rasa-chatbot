@@ -7,10 +7,14 @@ pipeline:
   # If you'd like to customize it, uncomment and adjust the pipeline.
   # See https://rasa.com/docs/rasa/tuning-your-model for more information.
   - name: SpacyNLP
+    # language model to load
+    model: "en_core_web_md"
+
   - name: SpacyTokenizer
   - name: SpacyFeaturizer
   - name: RegexFeaturizer
   - name: LexicalSyntacticFeaturizer
+  
   - name: CountVectorsFeaturizer
     # Analyzer to use, either 'word', 'char', or 'char_wb'
     analyzer: char_wb
@@ -21,8 +25,14 @@ pipeline:
     # OOV_token: _oov_
     # Whether to use a shared vocab
     # use_shared_vocab: False
+
   - name: DIETClassifier
+    model_confidence: linear_norm
+    constrain_similarities: true
+    epochs: 100
+    # can turn off cause we are using Regex Entity Extractor
     entity_recognition: False
+
   - name: RegexEntityExtractor
     # text will be processed with case insensitive as default
     case_sensitive: False
@@ -30,12 +40,13 @@ pipeline:
     use_lookup_tables: False
     # use regexes to extract entities
     use_regexes: True
-    #model_confidence: linear_norm
-    epochs: 100
-    #constrain_similarities: true
+
   - name: EntitySynonymMapper
   - name: ResponseSelector
+    # model_confidence: linear_norm
+    # constrain_similarities: true
     epochs: 100
+
   - name: FallbackClassifier
     threshold: 0.5
     ambiguity_threshold: 0.1
@@ -51,5 +62,6 @@ policies:
   - name: TEDPolicy
     max_history: 5
     epochs: 100
-    constrain_similarities: true
+    # model_confidence: linear_norm
+    # constrain_similarities: true
   - name: RulePolicy

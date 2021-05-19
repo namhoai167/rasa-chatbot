@@ -83,6 +83,53 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         ]
 
 
+class ActionSolveMultipleChoiceSentenceCompletionWithListOfAnswers(Action):
+
+    def name(self) -> Text:
+        return "action_solve_multiple_choice_sentence_completion_with_list_of_answers"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        ELECTRA_PATH = './electra-small-generator'
+        ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
+        ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
+        fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
+        sentence_value = tracker.get_slot("sentence")
+        sentence_value = sentence_value.replace('_', '***mask***')
+
+        bot_choice = fb.rank(sentence_value, options=tracker.get_slot("answers"))[0]
+        dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
+
+        return [
+            SlotSet("sentence", None),
+            SlotSet("answers", None)
+        ]
+
+
+class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndAnswers(Action):
+
+    def name(self) -> Text:
+        return "action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_answers"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        ELECTRA_PATH = './electra-small-generator'
+        ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
+        ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
+        fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
+        sentence_value = tracker.get_slot("sentence_and_answers").pop()
+        sentence_value = sentence_value.replace('_', '***mask***')
+
+        bot_choice = fb.rank(sentence_value, options=tracker.get_slot("sentence_and_answers"))[0]
+        dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
+
+        return [
+            SlotSet("sentence_and_answers", None)
+        ]
+
+
 class ActionRequestToTracau(Action):
     def name(self) -> Text:
         return "action_request_to_tracau"
