@@ -9,13 +9,21 @@ nlu:
       - could you choose the word to complete this sentence
       - could you choose the phrase that best completes the sentence from four choices
   
-  - intent: request_multiple_choice_sentence_completion_with_question
+  - intent: reply_with_multiple_choice
     examples: |
-      - can you help me with this multiple choice sentence completion [Your new coffee machine comes with detailed _ which will help you use it more effectively](sentence)
-      - please solve this sentence that has one blank spot [Either the marketing director or the sales manager will represent Centum Construction Inc. _ the Bexco Architecture Conference](sentence)
-      - give me the answer for this question of TOEIC reading part 5 [Following the visit to your production facility in Hong Kong next week, we _ a comprehensive factory automation program to meet your company's needs](sentence)
-      - could you choose the word to complete this sentence [_ she joined our company three years ago, Mrs. Mashimo has greatly expanded our customer base](sentence)
-      - could you choose the phrase that best completes the sentence from four choices [The company _ working on the project for the main office even before it chose the land to build on](sentence)
+      - [will begin](answers), [had begun](answers), [has begun](answers), [is beginning](answers)
+      - (A)[When](answers) (B)[Before](answers) (C)[Whereas](answers) (D)[Since](answers)
+      - (A) [instruct](answers) (B) [instructing](answers) (C) [instructions](answers) (D) [instructional](answers)
+      - (A)[among](answers)(B)[up](answers)(C)[at](answers)(D)[of](answers)
+      - A.[will create](answers) B.[was created](answers) C.[having created](answers) D.[had been creating](answers)
+
+  - intent: request_multiple_choice_sentence_completion_with_list_of_sentence_and_answers
+    examples: |
+      - can you help me with this multiple choice sentence completion [Your new coffee machine comes with detailed _ which will help you use it more effectively.](sentence_and_answers)(A)[instruct](sentence_and_answers)(B)[instructing](sentence_and_answers)(C)[instructions](sentence_and_answers)(D)[instructional](sentence_and_answers)
+      - please solve this sentence that has one blank spot [Either the marketing director or the sales manager will represent Centum Construction Inc. _ the Bexco Architecture Conference.](sentence_and_answers) (A) [among](sentence_and_answers) (B) [up](sentence_and_answers) (C) [at](sentence_and_answers) (D) [of](sentence_and_answers)
+      - give me the answer for this question of TOEIC reading part 5 [Following the visit to your production facility in Hong Kong next week, we _ a comprehensive factory automation program to meet your company's needs.](sentence_and_answers) A.[will create](sentence_and_answers B.[was created](sentence_and_answers) C.[having created](sentence_and_answers) D.[had been creating](sentence_and_answers)
+      - could you choose the word to complete this sentence [_ she joined our company three years ago, Mrs. Mashimo has greatly expanded our customer base.](sentence_and_answers)(A)[When](sentence_and_answers) (B)[Before](sentence_and_answers) (C)[Whereas](sentence_and_answers) (D)[Since](sentence_and_answers)
+      - could you choose the phrase that best completes the sentence from four choices [The company _ working on the project for the main office even before it chose the land to build on.](sentence_and_answers)[will begin](sentence_and_answers), [had begun](sentence_and_answers), [has begun](sentence_and_answers), [is beginning](sentence_and_answers)
 
   - regex: phrase_to_tracau
     examples: |

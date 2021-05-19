@@ -19,22 +19,39 @@ rules:
   - slot_was_set:
     - requested_slot: null
   # The actions we want to run when the form is submitted.
-  - action: utter_comfirm_sentence_answers_values
+  #- action: utter_comfirm_sentence_answers_values
   - action: action_solve_multiple_choice_sentence_completion
 
-- rule: Submit and solve English multiple choice sentence completion form with question
+- rule: Store slot for English multiple choice sentence completion form with list of answers when user request
+  steps:
+  - intent: request_multiple_choice_sentence_completion
+  - action: english_multiple_choice_sentence_completion_with_list_of_answer_form
+  - active_loop: english_multiple_choice_sentence_completion_with_list_of_answer_form
+
+- rule: Submit and solve English multiple choice sentence completion form with list of answers
+  condition:
+  - active_loop: english_multiple_choice_sentence_completion_with_list_of_answers_form
+  steps:
+  - action: english_multiple_choice_sentence_completion_with_list_of_answers_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  #- action: utter_comfirm_sentence_answers_values
+  - action: action_solve_multiple_choice_sentence_completion_with_list_of_answers
+
+- rule: Submit and solve English multiple choice sentence completion form with list of question and answers
   condition:
   # Condition that form is active.
-  - active_loop: english_multiple_choice_sentence_completion_form_with_question
+  - active_loop: english_multiple_choice_sentence_completion_with_list_of_sentence_and_answers_form
   steps:
   # Form is deactivated
-  - action: english_multiple_choice_sentence_completion_form
+  - action: english_multiple_choice_sentence_completion_with_list_of_sentence_and_answers_form
   - active_loop: null
   - slot_was_set:
     - requested_slot: null
   # The actions we want to run when the form is submitted.
-  - action: utter_comfirm_sentence_answers_values
-  - action: action_solve_multiple_choice_sentence_completion
+  #- action: utter_comfirm_sentence_answers_values
+  - action: action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_answers
 
 - rule: Trigger a message whenever they send a message with low NLU confidence
   steps:
