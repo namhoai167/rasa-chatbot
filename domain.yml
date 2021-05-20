@@ -1,52 +1,47 @@
 version: '2.0'
-config:
-  store_entities_as_slots: true
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
 intents:
-- request_multiple_choice_sentence_completion:
-    use_entities: false
-- request_to_tracau:
-    use_entities: true
-- nlu_fallback:
-    use_entities: false
-- writing_check:
-    use_entities: true
+- nlu_fallback
+- request_to_tracau
+- reply_with_multiple_choice
+- writing_check
+- request_to_tracau_without_phrase
+- writing_check_without_text
 entities:
+- answers
 - phrase_to_tracau
+- sentence_and_answers
 - text
 slots:
   sentence:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
+    type: text
     influence_conversation: true
   answer_a:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
+    type: text
     influence_conversation: true
   answer_b:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
+    type: text
     influence_conversation: true
   answer_c:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
+    type: text
     influence_conversation: true
   answer_d:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
+    type: text
     influence_conversation: true
-  requested_slot:
-    type: rasa.shared.core.slots.UnfeaturizedSlot
-    initial_value: null
-    auto_fill: true
-    influence_conversation: false
+  answers:
+    type: list
+    influence_conversation: true
+  sentence_and_answers:
+    type: list
+    influence_conversation: true
+  phrase_to_tracau:
+    type: text
+    influence_conversation: true
+  text:
+    type: text
+    influence_conversation: true
 responses:
   utter_ask_sentence:
   - text: Please give me the sentence for completion
@@ -60,11 +55,17 @@ responses:
   - text: And finally the answer D.
   utter_comfirm_sentence_answers_values:
   - text: 'Your sentence: "{sentence}" & 4 answers: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
+  utter_ask_phrase:
+  - text: Sure! Which phrase do you want to ask?
+  utter_ask_text_for_correction:
+  - text: Sure! Give me the text you want to analyse.
 actions:
 - action_fallback_chat
-- action_solve_multiple_choice_sentence_completion
 - action_request_to_tracau
+- action_request_to_tracau_from_slot
+- action_solve_multiple_choice_sentence_completion
 - action_writing_check
+- action_writing_check_from_slot
 forms:
   english_multiple_choice_sentence_completion_form:
     required_slots:
@@ -78,4 +79,23 @@ forms:
       - type: from_text
       sentence:
       - type: from_text
-e2e_actions: []
+  english_multiple_choice_sentence_completion_with_list_of_answers_form:
+    required_slots:
+      sentence:
+      - type: from_text
+      answers:
+      - type: from_entity
+        entity: answers
+  english_multiple_choice_sentence_completion_with_list_of_sentence_and_answers_form:
+    required_slots:
+      sentence_and_answers:
+      - type: from_entity
+        entity: sentence_and_answers
+  request_to_tracau_form:
+    required_slots:
+      phrase_to_tracau:
+      - type: from_text
+  writing_check_form:
+    required_slots:
+      text:
+      - type: from_text

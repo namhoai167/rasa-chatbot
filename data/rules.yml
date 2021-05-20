@@ -29,10 +29,39 @@ rules:
 
 - rule: Retrieve phrase then send to TraCau API and get the respond
   steps:
-    - intent: request_to_tracau
-    - action: action_request_to_tracau
+  - intent: request_to_tracau
+  - action: action_request_to_tracau
 
-- rule: Retrieve text then correct using both LanguageTool and Gingerit
+- rule: Store slot for phrase
   steps:
-    - intent: writing_check
-    - action: action_writing_check
+  - intent: request_to_tracau_without_phrase
+  - action: utter_ask_phrase
+  - action: request_to_tracau_form
+  - active_loop: request_to_tracau_form
+
+- rule: Submit and sent to Tracau API and get the response
+  condition:
+  - active_loop: request_to_tracau_form
+  steps:
+  - action: request_to_tracau_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_request_to_tracau_from_slot
+
+- rule: Store slot for text
+  steps:
+  - intent: writing_check_without_text
+  - action: utter_ask_text_for_correction
+  - action: writing_check_form
+  - active_loop: writing_check_form
+
+- rule: Submit and sent to Language Tool and Gingerit to correct
+  condition:
+  - active_loop: writing_check_form
+  steps:
+  - action: writing_check_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_writing_check_from_slot

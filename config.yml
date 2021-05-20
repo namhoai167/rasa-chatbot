@@ -37,16 +37,15 @@ pipeline:
   - name: ResponseSelector
     epochs: 100
   - name: FallbackClassifier
-    threshold: 0.5
+    threshold: 0.75
     ambiguity_threshold: 0.1
-
 
 # Configuration for Rasa Core.
 # https://rasa.com/docs/rasa/core/policies/
 policies:
-# No configuration for policies was provided. The following default policies were used to train your model.
-# If you'd like to customize them, uncomment and adjust the policies.
-# See https://rasa.com/docs/rasa/policies for more information.
+  # No configuration for policies was provided. The following default policies were used to train your model.
+  # If you'd like to customize them, uncomment and adjust the policies.
+  # See https://rasa.com/docs/rasa/policies for more information.
   - name: MemoizationPolicy
   - name: TEDPolicy
     max_history: 5
