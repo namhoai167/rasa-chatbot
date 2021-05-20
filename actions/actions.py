@@ -211,7 +211,7 @@ class ActionRequestToTracau(Action):
             query = tracker.latest_message['entities'][-1]['value'].strip(
             '"').strip()
         except:
-            dispatcher.utter_message("Please wrap the phrase in double quotation mark \"")
+            dispatcher.utter_message("Please wrap the phrase in double quotation mark \" \"")
             return [AllSlotsReset()]
         url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
         try:
@@ -353,7 +353,7 @@ class ActionWritingCheck(Action):
             text = tracker.latest_message['entities'][0]['value'].strip(
             '"').strip()
         except:
-            dispatcher.utter_message("Please wrap the text in double quotation mark \"")
+            dispatcher.utter_message("Please wrap the text in double quotation mark \" \"")
             return [AllSlotsReset()]
         message = f'Here are some mistakes that I found:\n\n'
         message = message + "------------\n\n"
