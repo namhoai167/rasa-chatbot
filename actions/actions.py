@@ -186,7 +186,7 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
         entities = tracker.latest_message['entities']
         sentence_value = next(
-            (item['value'] for item in entities if item['entity'] == 'sentence'), '')
+            (item['value'] for item in entities if item['entity'] == 'sentence'), '').strip()
         if sentence_value == '':
             dispatcher.utter_message(
                 "Please enter with the right syntax, for example: Solve this TOEIC reading question: <sentence>(A)answer A(B)answer B(C)answer C(D)answer D")
@@ -194,13 +194,13 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         sentence_value = re.sub(r'_+', '***mask***', sentence_value)
         answers = [
             next((item['value']
-                 for item in entities if item['entity'] == 'answer_a'), ''),
+                 for item in entities if item['entity'] == 'answer_a'), '').strip(),
             next((item['value']
-                 for item in entities if item['entity'] == 'answer_b'), ''),
+                 for item in entities if item['entity'] == 'answer_b'), '').strip(),
             next((item['value']
-                 for item in entities if item['entity'] == 'answer_c'), ''),
+                 for item in entities if item['entity'] == 'answer_c'), '').strip(),
             next((item['value']
-                 for item in entities if item['entity'] == 'answer_d'), '')
+                 for item in entities if item['entity'] == 'answer_d'), '').strip()
         ]
         bot_choice = fb.rank(sentence_value, options=answers)[0]
         dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
