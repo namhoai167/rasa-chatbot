@@ -19,6 +19,7 @@ from transformers import (
     ElectraTokenizer,
     pipeline
 )
+import re
 import requests as rq
 import numpy as np
 from bs4 import BeautifulSoup
@@ -180,16 +181,16 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
         ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        sentence_value = tracker.get_slot("sentence")
-        sentence_value = sentence_value.replace('_', '***mask***')
-        answers = [
+        sentence = tracker.get_slot("sentence")
+        sentence = sentence.replace('_', '***mask***')
+        choices = [
             tracker.get_slot("answer_a"),
             tracker.get_slot("answer_b"),
             tracker.get_slot("answer_c"),
             tracker.get_slot("answer_d")
         ]
-        bot_choice = fb.rank(sentence_value, options=answers)[0]
-        dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
+        bot_answer_choice = fb.rank(sentence, options=choices)[0]
+        dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
 
         return [
             SlotSet("sentence", None),
@@ -200,10 +201,10 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         ]
 
 
-class ActionSolveMultipleChoiceSentenceCompletionWithListOfAnswers(Action):
+class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
 
     def name(self) -> Text:
-        return "action_solve_multiple_choice_sentence_completion_with_list_of_answers"
+        return "action_solve_multiple_choice_sentence_completion_with_list_of_choices"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
@@ -212,38 +213,70 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfAnswers(Action):
         ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
         ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        sentence_value = tracker.get_slot("sentence")
-        sentence_value = sentence_value.replace('_', '***mask***')
 
-        bot_choice = fb.rank(sentence_value, options=tracker.get_slot("answers"))[0]
-        dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
+        sentence = tracker.get_slot("sentence")
+        choices = tracker.get_slot("choices")
+
+        # Use regex to replace mask for fitbert sentence
+        sentence = re.sub(r'[-_]+', '***mask***', sentence)
+
+        # Reformat choices list for fitbert 
+        if choices.count(',') >= 3:
+            choices = choices.rsplit(',')
+            choices = [s.strip() for s in choices]
+        else:
+            choices = re.split(r'\s*?\([A-Da-d]\)|[A-Da-d]\.|[A-Da-d]\s+?\.*', choices)
+            choices.pop(0)
+            choices = [s.strip() for s in choices]
+            
+        bot_answer_choice = fb.rank(sentence, options=choices)[0]
+        dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
 
         return [
             SlotSet("sentence", None),
-            SlotSet("answers", None)
+            SlotSet("choices", None)
         ]
 
 
-class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndAnswers(Action):
+class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndchoices(Action):
 
     def name(self) -> Text:
-        return "action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_answers"
+        return "action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
         ELECTRA_PATH = './electra-small-generator'
         ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
         ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        sentence_value = tracker.get_slot("sentence_and_answers").pop()
-        sentence_value = sentence_value.replace('_', '***mask***')
 
-        bot_choice = fb.rank(sentence_value, options=tracker.get_slot("sentence_and_answers"))[0]
-        dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
+        sentence_and_choices = tracker.get_slot("sentence_and_choices")
+
+        # Extract sentence from string with regex
+        sentence = re.match(r'.*[-_]+.*?(|\.*?)((?=\s*\w+(,\s*\w+){1,3}$)|(?=\s*?[Aa]\.)|(?=\s*?\([Aa]\)))', sentence_and_choices).group().strip()
+        
+        # Extract choices
+        choices = sentence_and_choices.replace(sentence,'').strip()
+
+        # Reformat sentence and choices for fitbert
+        # Use regex to replace mask
+        sentence = re.sub(r'[-_]+', '***mask***', sentence)
+
+        if choices.count(',') >= 3:
+            choices = choices.rsplit(',', 3)
+            choices = [s.strip() for s in choices]
+        else:
+            choices = re.split(r'\([A-Da-d]\)|\.[A-Da-d]|[A-Da-d]\.|[A-Da-d]\s', choices)
+            choices.pop()
+            choices = [s.strip() for s in choices]
+
+        bot_answer_choice = fb.rank(sentence, options=choices)[0]
+        dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
 
         return [
-            SlotSet("sentence_and_answers", None)
+            SlotSet("sentence_and_choices", None)
         ]
 
 
