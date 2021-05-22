@@ -1,54 +1,32 @@
-# Configuration for Rasa NLU.
-# https://rasa.com/docs/rasa/nlu/components/
+---
 language: en
-
 pipeline:
-  # No configuration for the NLU pipeline was provided. The following default pipeline was used to train your model.
-  # If you'd like to customize it, uncomment and adjust the pipeline.
-  # See https://rasa.com/docs/rasa/tuning-your-model for more information.
   - name: SpacyNLP
   - name: SpacyTokenizer
   - name: SpacyFeaturizer
   - name: RegexFeaturizer
   - name: LexicalSyntacticFeaturizer
-  - name: CountVectorsFeaturizer
-    # Analyzer to use, either 'word', 'char', or 'char_wb'
-    analyzer: char_wb
-    # Set the lower and upper boundaries for the n-grams
-    min_ngram: 1
+  - analyzer: char_wb
     max_ngram: 4
-    # Set the out-of-vocabulary token
-    # OOV_token: _oov_
-    # Whether to use a shared vocab
-    # use_shared_vocab: False
-  - name: DIETClassifier
-    entity_recognition: False
-  - name: RegexEntityExtractor
-    # text will be processed with case insensitive as default
-    case_sensitive: False
-    # use lookup tables to extract entities
-    use_lookup_tables: False
-    # use regexes to extract entities
-    use_regexes: True
-    #model_confidence: linear_norm
+    min_ngram: 1
+    name: CountVectorsFeaturizer
+  - entity_recognition: false
+    name: DIETClassifier
+  - case_sensitive: false
     epochs: 100
-    #constrain_similarities: true
+    name: RegexEntityExtractor
+    use_lookup_tables: false
+    use_regexes: true
   - name: EntitySynonymMapper
-  - name: ResponseSelector
-    epochs: 100
-  - name: FallbackClassifier
+  - epochs: 100
+    name: ResponseSelector
+  - ambiguity_threshold: 0.1
+    name: FallbackClassifier
     threshold: 0.75
-    ambiguity_threshold: 0.1
-
-# Configuration for Rasa Core.
-# https://rasa.com/docs/rasa/core/policies/
 policies:
-  # No configuration for policies was provided. The following default policies were used to train your model.
-  # If you'd like to customize them, uncomment and adjust the policies.
-  # See https://rasa.com/docs/rasa/policies for more information.
   - name: MemoizationPolicy
-  - name: TEDPolicy
-    max_history: 5
+  - constrain_similarities: true
     epochs: 100
-    constrain_similarities: true
+    max_history: 5
+    name: TEDPolicy
   - name: RulePolicy

@@ -21,6 +21,7 @@ from transformers import (
     pipeline
 )
 import requests as rq
+import re
 import numpy as np
 from bs4 import BeautifulSoup
 import nltk
@@ -161,9 +162,12 @@ class ActionOnFallBack(Action):
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(
             reply_ids, skip_special_tokens=True)[0]
-        bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(str(bot_reply), string=False)])
+        bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(
+            str(bot_reply), string=False)])
         if latest_user_message.casefold() != correction.casefold():
-            bot_reply = bot_reply + "\n(Small note: I found some mistakes in your message! Did you mean \"{0}\"?)".format(correction)
+            bot_reply = bot_reply + \
+                "\n(Small note: I found some mistakes in your message! Did you mean \"{0}\"?)".format(
+                    correction)
         dispatcher.utter_message(text=bot_reply)
         return [AllSlotsReset()]
 
@@ -180,24 +184,28 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
         ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        sentence_value = tracker.get_slot("sentence")
-        sentence_value = sentence_value.replace('_', '***mask***')
+        entities = tracker.latest_message['entities']
+        sentence_value = next(
+            (item['value'] for item in entities if item['entity'] == 'sentence'), '')
+        if sentence_value == '':
+            dispatcher.utter_message(
+                "Please enter with the right syntax, for example: Solve this TOEIC reading question: <sentence>(A)answer A(B)answer B(C)answer C(D)answer D")
+            return [AllSlotsReset()]
+        sentence_value = re.sub(r'_+', '***mask***', sentence_value)
         answers = [
-            tracker.get_slot("answer_a"),
-            tracker.get_slot("answer_b"),
-            tracker.get_slot("answer_c"),
-            tracker.get_slot("answer_d")
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_a'), ''),
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_b'), ''),
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_c'), ''),
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_d'), '')
         ]
         bot_choice = fb.rank(sentence_value, options=answers)[0]
         dispatcher.utter_message(text=f"My guess is: \"{bot_choice}\"")
 
-        return [
-            SlotSet("sentence", None),
-            SlotSet("answer_a", None),
-            SlotSet("answer_b", None),
-            SlotSet("answer_c", None),
-            SlotSet("answer_d", None)
-        ]
+        return [AllSlotsReset()]
 
 
 class ActionRequestToTracau(Action):
@@ -209,9 +217,10 @@ class ActionRequestToTracau(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         try:
             query = tracker.latest_message['entities'][-1]['value'].strip(
-            '"').strip()
+                '"').strip()
         except:
-            dispatcher.utter_message("Please wrap the phrase in double quotation mark \" \"")
+            dispatcher.utter_message(
+                "Please wrap the phrase in double quotation mark \" \"")
             return [AllSlotsReset()]
         url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
         try:
@@ -351,9 +360,10 @@ class ActionWritingCheck(Action):
         # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
         try:
             text = tracker.latest_message['entities'][0]['value'].strip(
-            '"').strip()
+                '"').strip()
         except:
-            dispatcher.utter_message("Please wrap the text in double quotation mark \" \"")
+            dispatcher.utter_message(
+                "Please wrap the text in double quotation mark \" \"")
             return [AllSlotsReset()]
         message = f'Here are some mistakes that I found:\n\n'
         message = message + "------------\n\n"

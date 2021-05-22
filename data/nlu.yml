@@ -1,12 +1,34 @@
 version: "2.0"
 nlu:
-- intent: request_multiple_choice_sentence_completion
+- regex: sentence
   examples: |
-    - can you help me with this multiple choice sentence completion?
-    - please solve this sentence that has one blank spot
-    - give me the answer for this question of TOEIC reading part 5
-    - could you choose the word to complete this sentence
-    - could you choose the phrase that best completes the sentence from four choices
+    - (?<=:).*?(?=\(A\))
+    - (?<=").*?(?="\(A\))
+- regex: answer_a
+  examples: |
+    - (?<=\(A\)).*?(?=\(B\))
+- regex: answer_b
+  examples: |
+    - (?<=\(B\)).*?(?=\(C\))
+- regex: answer_c
+  examples: |
+    - (?<=\(C\)).*?(?=\(D\))
+- regex: answer_d
+  examples: |
+    - (?<=\(D\)).*
+
+- intent: multiple_choice_sentence_completion
+  examples: |
+    - can you help me with this multiple choice sentence completion: [Mr. Holt's acceptance of the financial executive position is _ his satisfaction with the salary offer.](sentence)(A)[ in contrast to](answer_a)(B)[dependent on](answer_b)(C)[ as opposed to](answer_c)(D)[ on condition that](answer_d)
+    - please solve this sentence:[ The assets of Marble Faun Publishing Company _ last quarter when one of their main local distributors went out of business.](sentence)(A)[suffer](answer_a)(B)[suffers](answer_b)(C)[suffering](answer_c)(D)[suffered](answer_d)
+    - give me the answer for this question of TOEIC reading part 5:[ lndie film director Luke Steele will be in London for the premiere of _ new movie.](sentence)(A)[him](answer_a)(B)[his](answer_b)(C)[himself](answer_c)(D)[he](answer_d)
+    - could you choose the word to complete this sentence:[ Laboratory employees are expected to wear a name tag and carry identification at _ times.](sentence)(A)[full](answer_a)(B)[complete](answer_b)(C)[all](answer_c)(D)[total](answer_d)
+    - could you choose the phrase that best completes the sentence from four choices:[ The latest training _ contains tips on teaching a second language to international students:](sentence)(A)[method](answer_a)(B)[guide](answer_b)(C)[staff](answer_c)(D)[role](answer_d)
+    - "[Ursa Major Corp. has _ negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](sentence)"(A)[soon](answer_a)(B)[shortly](answer_b)(C)[recently](answer_c)(D)[yet](answer_d)
+    - "[Ms. Cho relayed her concerns about the company's financial situation while she _ a meeting with the manager.](sentence)"(A)[having](answer_a)(B)[will have](answer_b)(C)[was having](answer_c)(D)[has](answer_d)
+    - "[Whether it is _ to register for a student discount card depends on the needs of the individual.](sentence)"(A)[necessary](answer_a)(B)[necessarily](answer_b)(C)[necessitate](answer_c)(D)[necessity](answer_d)
+    - "[Even experienced clerks are encouraged to attend training _ to keep them updated on new ideas in the world of banking.](sentence)"(A)[materials](answer_a)(B)[sessions](answer_b)(C)[experiences](answer_c)(D)[positions](answer_d)
+    - "[Workers are advised not to operate certain machines by _ .](sentence)"(A)[they](answer_a)(B)[them](answer_b)(C)[their](answer_c)(D)[themselves](answer_d)
 - intent: request_to_tracau
   examples: |
     - find me the usage of the phrase ["for all"](phrase_to_tracau)
@@ -20,7 +42,7 @@ nlu:
     - assist me with the structure ["at all cost"](phrase_to_tracau).
     - what exactly does the phrase ["sleep"](phrase_to_tracau) mean?
     - examples of ["on the dot"](phrase_to_tracau) word combinations?
-    - what is ["in the nick of time"](phrase_to_tracau)["in the nick of time"](text)["in the nick of time"](phrase_to_tracau)
+    - what is ["in the nick of time"](phrase_to_tracau)
 - intent: request_to_tracau_without_phrase
   examples: |
     - can u find the usage of an English phrase for me?
