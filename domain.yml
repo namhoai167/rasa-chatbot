@@ -115,18 +115,20 @@ forms:
         - type: from_text
 slots:
   phrase_to_tracau:
-    influence_conversation: true
+    auto_fill: False
+    influence_conversation: false
     type: text
   text:
-    influence_conversation: true
-    type: text
-  answer_c:
-    type: text
-  answer_d:
+    auto_fill: False
+    influence_conversation: false
     type: text
   sentence:
+    auto_fill: False
+    influence_conversation: false
     type: text
   choices:
+    auto_fill: False
+    influence_conversation: false
     type: text
 session_config:
   session_expiration_time: 60
