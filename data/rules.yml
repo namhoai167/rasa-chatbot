@@ -1,69 +1,76 @@
-version: "2.0"
-
+---
+version: '2.0'
 rules:
-
-# - rule: Store slot for English multiple choice sentence completion form when user request
-#   steps:
-#   - intent: request_multiple_choice_sentence_completion
-#   - action: english_multiple_choice_sentence_completion_form
-#   - active_loop: english_multiple_choice_sentence_completion_form
-
-# - rule: Submit and solve English multiple choice sentence completion form
-#   condition:
-#   # Condition that form is active.
-#   - active_loop: english_multiple_choice_sentence_completion_form
-#   steps:
-#   # Form is deactivated
-#   - action: english_multiple_choice_sentence_completion_form
-#   - active_loop: null
-#   - slot_was_set:
-#     - requested_slot: null
-#   # The actions we want to run when the form is submitted.
-#   #- action: utter_comfirm_sentence_choices_values
-#   - action: action_solve_multiple_choice_sentence_completion
-
-- rule: Store slot for multiple choice sentence completion form with list of choices when user request
-  steps:
-  - intent: request_multiple_choice_sentence_completion
-  - action: english_multiple_choice_sentence_completion_with_list_of_choices_form
-  - active_loop: english_multiple_choice_sentence_completion_with_list_of_choices_form
-
-- rule: Submit and solve multiple choice sentence completion form with list of choices
-  condition:
-  - active_loop: english_multiple_choice_sentence_completion_with_list_of_choices_form
-  steps:
-  - action: english_multiple_choice_sentence_completion_with_list_of_choices_form
-  - active_loop: null
-  - slot_was_set:
-    - requested_slot: null
-  #- action: utter_comfirm_sentence_choices_values
-  - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
-
-# - rule: Submit and solve English multiple choice sentence completion form with list of question and choices
-#   condition:
-#   # Condition that form is active.
-#   - active_loop: english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form
-#   steps:
-#   # Form is deactivated
-#   - action: english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form
-#   - active_loop: null
-#   - slot_was_set:
-#     - requested_slot: null
-#   # The actions we want to run when the form is submitted.
-#   #- action: utter_comfirm_sentence_choices_values
-#   - action: action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
-
-- rule: Trigger a message whenever they send a message with low NLU confidence
-  steps:
-  - intent: nlu_fallback
-  - action: action_fallback_chat
-
-- rule: Retrieve phrase then send to TraCau API and get the respond
-  steps:
-    - intent: request_to_tracau
-    - action: action_request_to_tracau
-
-- rule: Retrieve text then correct using both LanguageTool and Gingerit
-  steps:
-    - intent: writing_check
-    - action: action_writing_check
+  # TOEIC READING PART 5
+  - rule: Retrieve information about sentence and answers then feed into ELECTRA for prediction
+    steps:
+      - intent: multiple_choice_sentence_completion
+      - action: action_solve_multiple_choice_sentence_completion
+  - rule: Store slot for multiple choice sentence completion form with list of choices when user request
+    steps:
+      - intent: request_multiple_choice_sentence_completion
+      - action: english_multiple_choice_sentence_completion_with_list_of_choices_form
+      - active_loop: english_multiple_choice_sentence_completion_with_list_of_choices_form
+  - rule: Submit and solve multiple choice sentence completion form with list of choices
+    condition:
+      - active_loop: english_multiple_choice_sentence_completion_with_list_of_choices_form
+    steps:
+      - action: english_multiple_choice_sentence_completion_with_list_of_choices_form
+      - active_loop: null
+      - slot_was_set:
+          - requested_slot: null
+      - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
+  #- rule: Submit and solve English multiple choice sentence completion form with list of question and choices
+  #  condition:
+  #    - active_loop: english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form
+  #  steps:
+  #    - action: english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form
+  #    - active_loop: null
+  #    - slot_was_set:
+  #        - requested_slot: null
+  #    - action: action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
+  # BLENDERBOT
+  - rule: Feed into BlenderBot whenever user send a message with low NLU confidence
+    steps:
+      - intent: nlu_fallback
+      - action: action_fallback_chat
+  # TRACAU
+  - rule: Retrieve phrase then send to TraCau API and get the respond
+    steps:
+      - intent: request_to_tracau
+      - action: action_request_to_tracau
+  - rule: Store slot for phrase
+    steps:
+      - intent: request_to_tracau_without_phrase
+      - action: utter_ask_phrase
+      - action: request_to_tracau_form
+      - active_loop: request_to_tracau_form
+    condition:
+      - active_loop: request_to_tracau_form
+  - rule: Submit and sent to Tracau API and get the response
+    steps:
+      - action: request_to_tracau_form
+      - active_loop: null
+      - slot_was_set:
+          - requested_slot: null
+      - action: action_request_to_tracau_from_slot
+  # SPELLING AND GRAMMAR CORRECTION
+  - rule: Store slot for text
+    steps:
+      - intent: writing_check_without_text
+      - action: utter_ask_text_for_correction
+      - action: writing_check_form
+      - active_loop: writing_check_form
+    condition:
+      - active_loop: writing_check_form
+  - rule: Retrieve text then correct using both LanguageTool and Gingerit
+    steps:
+      - intent: writing_check
+      - action: action_writing_check
+  - rule: Submit and sent to Language Tool and Gingerit to correct
+    steps:
+      - action: writing_check_form
+      - active_loop: null
+      - slot_was_set:
+          - requested_slot: null
+      - action: action_writing_check_from_slot
