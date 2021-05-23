@@ -124,6 +124,8 @@ slots:
     type: text
   answer_d:
     type: text
+  sentence:
+    type: text
   choices:
     type: text
 session_config:
