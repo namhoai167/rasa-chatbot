@@ -14,7 +14,7 @@ pipeline:
   - name: SpacyFeaturizer
   - name: RegexFeaturizer
   - name: LexicalSyntacticFeaturizer
-  
+
   - name: CountVectorsFeaturizer
     # Analyzer to use, either 'word', 'char', or 'char_wb'
     analyzer: char_wb
@@ -28,7 +28,7 @@ pipeline:
 
   - name: DIETClassifier
     model_confidence: linear_norm
-    constrain_similarities: true
+    constrain_similarities: True
     epochs: 100
     # can turn off cause we are using Regex Entity Extractor
     entity_recognition: False
@@ -44,7 +44,7 @@ pipeline:
   - name: EntitySynonymMapper
   - name: ResponseSelector
     # model_confidence: linear_norm
-    # constrain_similarities: true
+    # constrain_similarities: True
     epochs: 100
 
   - name: FallbackClassifier
@@ -63,5 +63,5 @@ policies:
     max_history: 5
     epochs: 100
     # model_confidence: linear_norm
-    # constrain_similarities: true
+    # constrain_similarities: True
   - name: RulePolicy

@@ -1,3 +1,10 @@
 version: "2.0"
 
 stories:
+# - story: Submit and solve English multiple choice sentence completion form with list of choices
+#   steps:
+#   - intent: request_multiple_choice_sentence_completion
+#   - action: english_multiple_choice_sentence_completion_with_list_of_choices_form
+#   - active_loop: english_multiple_choice_sentence_completion_with_list_of_choices_form
+#   - active_loop: null
+#   - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
