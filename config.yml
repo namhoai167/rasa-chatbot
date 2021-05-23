@@ -1,11 +1,6 @@
-# Configuration for Rasa NLU.
-# https://rasa.com/docs/rasa/nlu/components/
+---
 language: en
-
 pipeline:
-  # No configuration for the NLU pipeline was provided. The following default pipeline was used to train your model.
-  # If you'd like to customize it, uncomment and adjust the pipeline.
-  # See https://rasa.com/docs/rasa/tuning-your-model for more information.
   - name: SpacyNLP
     # language model to load
     model: "en_core_web_md"
@@ -55,12 +50,8 @@ pipeline:
 # Configuration for Rasa Core.
 # https://rasa.com/docs/rasa/core/policies/
 policies:
-# No configuration for policies was provided. The following default policies were used to train your model.
-# If you'd like to customize them, uncomment and adjust the policies.
-# See https://rasa.com/docs/rasa/policies for more information.
   - name: MemoizationPolicy
-  - name: TEDPolicy
-    max_history: 5
+  - constrain_similarities: true
     epochs: 100
     # model_confidence: linear_norm
     # constrain_similarities: True

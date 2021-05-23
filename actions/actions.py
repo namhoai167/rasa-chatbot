@@ -10,6 +10,7 @@ from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
+from rasa_sdk.events import AllSlotsReset
 
 from fitbert import FitBert
 from transformers import (
@@ -28,7 +29,6 @@ from nltk.stem import WordNetLemmatizer
 from nltk import tokenize
 nltk.download('wordnet')
 nltk.download('punkt')
-
 global language_tool
 global gg
 language_tool = language_tool_python.LanguageTool('en-US')
@@ -55,10 +55,10 @@ def cut_paragraph(text, maximum_len=300):
                 return splited_paragraph
 
 
-def split_into_sentences(text, string=True, joiner='\n'):
+def split_into_sentences(text, string=True):
     sentences = tokenize.sent_tokenize(text)
     if string:
-        return joiner.join(sentences)
+        return "\n".join(sentences)
     return sentences
 
 
@@ -162,9 +162,12 @@ class ActionOnFallBack(Action):
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(
             reply_ids, skip_special_tokens=True)[0]
-        bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(str(bot_reply), string=False)])
+        bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(
+            str(bot_reply), string=False)])
         if latest_user_message.casefold() != correction.casefold():
-            bot_reply = bot_reply + "\n(Small note: I found some mistakes in your message! Did you mean \"{0}\"?)".format(correction)
+            bot_reply = bot_reply + \
+                "\n(Small note: I found some mistakes in your message! Did you mean \"{0}\"?)".format(
+                    correction)
         dispatcher.utter_message(text=bot_reply)
         return []
 
@@ -181,24 +184,28 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
         ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        sentence = tracker.get_slot("sentence")
-        sentence = sentence.replace('_', '***mask***')
+        entities = tracker.latest_message['entities']
+        sentence = next(
+            (item['value'] for item in entities if item['entity'] == 'sentence'), '').strip()
+        if sentence == '':
+            dispatcher.utter_message(
+                "Please enter with the right syntax, for example: Solve this TOEIC reading question: <sentence>(A)answer A(B)answer B(C)answer C(D)answer D")
+            return [AllSlotsReset()]
+        sentence = re.sub(r'_+', '***mask***', sentence)
         choices = [
-            tracker.get_slot("answer_a"),
-            tracker.get_slot("answer_b"),
-            tracker.get_slot("answer_c"),
-            tracker.get_slot("answer_d")
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_a'), '').strip(),
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_b'), '').strip(),
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_c'), '').strip(),
+            next((item['value']
+                 for item in entities if item['entity'] == 'answer_d'), '').strip()
         ]
         bot_answer_choice = fb.rank(sentence, options=choices)[0]
         dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
 
-        return [
-            SlotSet("sentence", None),
-            SlotSet("answer_a", None),
-            SlotSet("answer_b", None),
-            SlotSet("answer_c", None),
-            SlotSet("answer_d", None)
-        ]
+        return [AllSlotsReset()]
 
 
 class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
@@ -287,9 +294,13 @@ class ActionRequestToTracau(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        query = tracker.latest_message['entities'][-1]['value'].strip(
-            '"').strip()
-        # dispatcher.utter_message(text=query)
+        try:
+            query = tracker.latest_message['entities'][-1]['value'].strip(
+                '"').strip()
+        except:
+            dispatcher.utter_message(
+                "Please wrap the phrase in double quotation mark \" \"")
+            return [AllSlotsReset()]
         url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
         try:
             respond = rq.get(url).json()
@@ -299,8 +310,26 @@ class ActionRequestToTracau(Action):
             query = lemmatizer.lemmatize(query)
             url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
             respond = rq.get(url).json()
-            html = respond['tratu'][0]['fields']['fulltext']
-        parsed_html = BeautifulSoup(html)
+            try:
+                html = respond['tratu'][0]['fields']['fulltext']
+            except:
+                list_sentences = [sent['fields']
+                                  for sent in respond['sentences']]
+                list_return = []
+                for sentence in list_sentences:
+                    en = BeautifulSoup(
+                        sentence['en'], features="lxml").getText()
+                    en = " ".join(en.split())
+                    vi = sentence['vi']
+                    vi = " ".join(vi.split())
+                    list_return.append(en+'\n'+vi)
+                message = "Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references:\n \n".format(
+                    query)
+                mesage = message + \
+                    '\n---------------------\n'.join(list_return)
+                dispatcher.utter_message(mesage)
+                return [AllSlotsReset()]
+        parsed_html = BeautifulSoup(html, features="lxml")
         if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
             l = [x for x in parsed_html.find("article", {
                                              'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
@@ -313,7 +342,7 @@ class ActionRequestToTracau(Action):
         else:
             dispatcher.utter_message(
                 text="Sorry, I can't find the phrase {0} in the database".format(query))
-            return []
+            return [AllSlotsReset()]
         l2 = []
         for element in l:
             if element.name == 'dtrn':
@@ -328,7 +357,75 @@ class ActionRequestToTracau(Action):
 
         dispatcher.utter_message(text='\n'.join(
             [string for string in l2 if string]))
-        return []
+        return [AllSlotsReset()]
+
+
+class ActionRequestToTracauFromSlot(Action):
+    def name(self) -> Text:
+        return "action_request_to_tracau_from_slot"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        query = tracker.get_slot("phrase_to_tracau").strip(
+            '"').strip()
+        url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
+        try:
+            respond = rq.get(url).json()
+            html = respond['tratu'][0]['fields']['fulltext']
+        except:
+            lemmatizer = WordNetLemmatizer()
+            query = lemmatizer.lemmatize(query)
+            url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
+            respond = rq.get(url).json()
+            try:
+                html = respond['tratu'][0]['fields']['fulltext']
+            except:
+                list_sentences = [sent['fields']
+                                  for sent in respond['sentences']]
+                list_return = []
+                for sentence in list_sentences:
+                    en = BeautifulSoup(
+                        sentence['en'], features="lxml").getText()
+                    en = " ".join(en.split())
+                    vi = sentence['vi']
+                    vi = " ".join(vi.split())
+                    list_return.append(en+'\n'+vi)
+                message = "Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references\n \n".format(
+                    query)
+                mesage = message + \
+                    '\n---------------------\n'.join(list_return)
+                dispatcher.utter_message(mesage)
+                return [SlotSet("phrase_to_tracau", None)]
+        parsed_html = BeautifulSoup(html, features="lxml")
+        if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
+            l = [x for x in parsed_html.find("article", {
+                                             'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
+        elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
+            l = [x for x in parsed_html.find("article", {
+                                             'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
+        elif parsed_html.find("article", {'data-tab-name': "Anh - Anh"}):
+            l = [x for x in parsed_html.find("article", {
+                                             'data-tab-name': "Anh - Anh"}).find("div", {'class': "dict--content"}).children]
+        else:
+            dispatcher.utter_message(
+                text="Sorry, I can't find the phrase {0} in the database".format(query))
+            return [SlotSet("phrase_to_tracau", None)]
+        l2 = []
+        for element in l:
+            if element.name == 'dtrn':
+                definition_text = element.find(
+                    'dtrn', text=True, recursive=False)
+                l2.append(definition_text)
+                for child in element.children:
+                    if child.string:
+                        l2.append(child.string)
+            else:
+                l2.append(element.getText())
+
+        dispatcher.utter_message(text='\n'.join(
+            [string for string in l2 if string]))
+        return [AllSlotsReset()]
 
 
 class ActionWritingCheck(Action):
@@ -340,8 +437,13 @@ class ActionWritingCheck(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
         # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
-        text = tracker.latest_message['entities'][0]['value'].strip(
-            '"').strip()
+        try:
+            text = tracker.latest_message['entities'][0]['value'].strip(
+                '"').strip()
+        except:
+            dispatcher.utter_message(
+                "Please wrap the text in double quotation mark \" \"")
+            return [AllSlotsReset()]
         message = f'Here are some mistakes that I found:\n\n'
         message = message + "------------\n\n"
         message = message + print_errors(text, language_tool, gg) + '\n\n'
@@ -352,6 +454,32 @@ class ActionWritingCheck(Action):
             correct_gingerit(correct_language_tool(
                 text, language_tool), gg) + "\n\n"
         message = message + "------------\n\n"
-        message = message + "Please keep in mind that these corrections may be wrong and should only be used as a preference"
+        message = message + "Please keep in mind that these corrections may be wrong and should only be used as a reference"
         dispatcher.utter_message(message)
-        return []
+        return [AllSlotsReset()]
+
+
+class ActionWritingCheckFromSlot(Action):
+    def name(self) -> Text:
+        return "action_writing_check_from_slot"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
+        # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
+        text = tracker.get_slot("text").strip(
+            '"').strip()
+        message = f'Here are some mistakes that I found:\n'
+        message = message + "------------\n\n"
+        message = message + print_errors(text, language_tool, gg) + '\n'
+        message = message + "------------\n \n"
+        message = message + f"Here is the text after correction:\n"
+        message = message + "------------\n"
+        message = message + \
+            correct_gingerit(correct_language_tool(
+                text, language_tool), gg) + "\n"
+        message = message + "------------\n"
+        message = message + "Please keep in mind that these corrections may be wrong and should only be used as a reference"
+        dispatcher.utter_message(message)
+        return [AllSlotsReset()]

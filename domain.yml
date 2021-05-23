@@ -4,22 +4,61 @@ intents:
   - request_multiple_choice_sentence_completion
   # - request_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
   - reply_with_multiple_choice
-  - request_to_tracau
-  - writing_check
+  - request_to_tracau_without_phrase
+  - writing_check_without_text
   - nlu_fallback
+  # Format https://rasa.com/docs/rasa/domain#ignoring-entities-for-certain-intents
+  - request_to_tracau:
+      ignore_entities:
+        - sentence
+        - answer_a
+        - answer_b
+        - answer_c
+        - answer_d
+        - text
+      use_entities:
+        - phrase_to_tracau
+  - multiple_choice_sentence_completion:
+      ignore_entities:
+        - phrase_to_tracau
+        - text
+      use_entities:
+        - sentence
+        - answer_a
+        - answer_b
+        - answer_c
+        - answer_d
+  - writing_check:
+      ignore_entities:
+        - phrase_to_tracau
+        - sentence
+        - answer_a
+        - answer_b
+        - answer_c
+        - answer_d
+      use_entities:
+        - text
+
 entities:
   - phrase_to_tracau
   - text
-  # - sentence
+  - sentence
+  - answer_a
+  - answer_b
+  - answer_c
+  - answer_d
   # - choices
   # - sentence_and_choices
+
 actions:
   - action_fallback_chat
   - action_solve_multiple_choice_sentence_completion
   - action_solve_multiple_choice_sentence_completion_with_list_of_choices
   # - action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
   - action_request_to_tracau
+  - action_request_to_tracau_from_slot
   - action_writing_check
+  - action_writing_check_from_slot
 
 responses:
   utter_ask_sentence:
@@ -38,6 +77,10 @@ responses:
   - text: Please give me the incomplete sentence and at least 2 possible choices.
   utter_comfirm_sentence_choices_values:
     - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
+  utter_ask_phrase:
+    - text: Sure! Which phrase do you want to ask?
+  utter_ask_text_for_correction:
+    - text: Sure! Give me the text you want to analyse.
   
 forms:
   english_multiple_choice_sentence_completion_form:
@@ -62,13 +105,21 @@ forms:
   #   required_slots:
   #     sentence_and_choices:
   #     - type: from_text
+  request_to_tracau_form:
+    required_slots:
+      phrase_to_tracau:
+      - type: from_text
+  writing_check_form:
+    required_slots:
+      text:
+      - type: from_text
       
 slots:
-  sentence:
+  phrase_to_tracau:
+    influence_conversation: true
     type: text
-  answer_a:
-    type: text
-  answer_b:
+  text:
+    influence_conversation: true
     type: text
   answer_c:
     type: text
