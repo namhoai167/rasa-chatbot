@@ -56,32 +56,32 @@ actions:
   - action_fallback_chat
   - action_solve_multiple_choice_sentence_completion
   - action_solve_multiple_choice_sentence_completion_with_list_of_choices
-  #- action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
+#  - action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
   - action_request_to_tracau
   - action_request_to_tracau_from_slot
   - action_writing_check
   - action_writing_check_from_slot
 responses:
   utter_ask_sentence:
-    - text: Please give me the incomplete sentence.
+    - text: 'Please give me the incomplete sentence.'
   utter_ask_answer_a:
-    - text: Now please give me the answer A.
+    - text: 'Now please give me the answer A.'
   utter_ask_answer_b:
-    - text: Now please, the answer B.
+    - text: 'Now please, the answer B.'
   utter_ask_answer_c:
-    - text: Next please the answer C.
+    - text: 'Next please the answer C.'
   utter_ask_answer_d:
-    - text: And finally the answer D.
+    - text: 'And finally the answer D.'
   utter_ask_choices:
-    - text: Now please give me at least 2 possible choices.
+    - text: 'Now please give me at least 2 possible choices.'
   utter_ask_sentence_and_choices:
-    - text: Please give me the incomplete sentence and at least 2 possible choices.
+    - text: 'Please give me the incomplete sentence and at least 2 possible choices.'
   utter_comfirm_sentence_choices_values:
     - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
   utter_ask_phrase:
-    - text: Sure! Which phrase do you want to ask?
+    - text: 'Sure! Which phrase do you want to ask?'
   utter_ask_text_for_correction:
-    - text: Sure! Give me the text you want to analyse.
+    - text: 'Sure! Give me the text you want to analyse.'
 forms:
   english_multiple_choice_sentence_completion_form:
     required_slots:
@@ -101,10 +101,10 @@ forms:
         - type: from_text
       choices:
         - type: from_text
-  #english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form:
-  #  required_slots:
-  #    sentence_and_choices:
-  #      - type: from_text
+#  english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form:
+#    required_slots:
+#     sentence_and_choices:
+#        - type: from_text
   request_to_tracau_form:
     required_slots:
       phrase_to_tracau:

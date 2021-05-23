@@ -51,7 +51,7 @@ pipeline:
 # https://rasa.com/docs/rasa/core/policies/
 policies:
   - name: MemoizationPolicy
-  - constrain_similarities: true
+    constrain_similarities: True
     epochs: 100
     # model_confidence: linear_norm
     # constrain_similarities: True
