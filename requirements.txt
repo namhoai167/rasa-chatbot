@@ -1,14 +1,15 @@
 #python==3.8.5
 rasa==2.6.2
-rasax==0.39.3
+rasa-x==0.39.3
 sanic-jwt>=1.6.0
 torch==1.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 fitbert==0.9.0
 transformers==4.6.0
 nltk==3.6.2
-requests=2.25.1
+requests==2.25.1
 beautifulsoup4==4.9.3
 language-tool-python==2.5.3
 gingerit==0.8.1
 spacy==3.0.6
+lxml==4.6.3
 https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.0.0/en_core_web_md-3.0.0.tar.gz#egg=en_core_web_md
