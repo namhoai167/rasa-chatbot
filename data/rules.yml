@@ -62,12 +62,12 @@ rules:
       - action: writing_check_form
       - active_loop: writing_check_form
   - rule: Retrieve text then correct using both LanguageTool and Gingerit
-    condition:
-      - active_loop: writing_check_form
     steps:
       - intent: writing_check
       - action: action_writing_check
   - rule: Submit and sent to Language Tool and Gingerit to correct
+    condition:
+      - active_loop: writing_check_form
     steps:
       - action: writing_check_form
       - active_loop: null

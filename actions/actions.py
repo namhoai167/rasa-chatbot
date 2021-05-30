@@ -55,10 +55,10 @@ def cut_paragraph(text, maximum_len=300):
                 return splited_paragraph
 
 
-def split_into_sentences(text, string=True):
+def split_into_sentences(text, string=True, joiner='\n'):
     sentences = tokenize.sent_tokenize(text)
     if string:
-        return "\n".join(sentences)
+        return joiner.join(sentences)
     return sentences
 
 
@@ -164,12 +164,11 @@ class ActionOnFallBack(Action):
             reply_ids, skip_special_tokens=True)[0]
         bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(
             str(bot_reply), string=False)])
-        if latest_user_message.casefold() != correction.casefold():
-            bot_reply = bot_reply + \
-                "\n(Small note: I found some mistakes in your message! Did you mean \"{0}\"?)".format(
-                    correction)
         dispatcher.utter_message(text=bot_reply)
-        return []
+        if latest_user_message.casefold() != correction.casefold():
+            dispatcher.utter_message(
+                "Small note: I found some mistakes in your message! Did you mean \"{0}\"?".format(correction))
+        return [AllSlotsReset()]
 
 
 class ActionSolveMultipleChoiceSentenceCompletion(Action):
@@ -245,6 +244,7 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
             SlotSet("choices", None)
         ]
 
+
 '''
 class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndchoices(Action):
 
@@ -290,6 +290,7 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndchoices(Ac
         ]
 '''
 
+
 class ActionRequestToTracau(Action):
     def name(self) -> Text:
         return "action_request_to_tracau"
@@ -298,11 +299,15 @@ class ActionRequestToTracau(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         try:
-            query = tracker.latest_message['entities'][-1]['value'].strip(
-                '"').strip()
+            entities = [entity['value'] for entity in tracker.latest_message['entities']
+                        if entity['entity'] == 'phrase_to_tracau']
+            query = max(entities, key=lambda x: len(x))
+            query = query.strip('"').strip()
         except:
             dispatcher.utter_message(
-                "Please wrap the phrase in double quotation mark \" \"")
+                "Sorry, I cannot find out what phrase you are trying to refer :(")
+            dispatcher.utter_message(
+                "Please put the phrase after a colon, or wrap the phrase in double quotation mark \" \" or in any kind of brackets so I can pick it up.")
             return [AllSlotsReset()]
         url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
         try:
@@ -325,12 +330,11 @@ class ActionRequestToTracau(Action):
                     en = " ".join(en.split())
                     vi = sentence['vi']
                     vi = " ".join(vi.split())
-                    list_return.append(en+'\n'+vi)
-                message = "Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references:\n \n".format(
-                    query)
-                mesage = message + \
-                    '\n---------------------\n'.join(list_return)
-                dispatcher.utter_message(mesage)
+                    list_return.append('- '+en+'\n'+vi)
+                dispatcher.utter_message("Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references\n \n".format(
+                    query))
+                for item in list_return:
+                    dispatcher.utter_message(item)
                 return [AllSlotsReset()]
         parsed_html = BeautifulSoup(html, features="lxml")
         if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
@@ -393,12 +397,11 @@ class ActionRequestToTracauFromSlot(Action):
                     en = " ".join(en.split())
                     vi = sentence['vi']
                     vi = " ".join(vi.split())
-                    list_return.append(en+'\n'+vi)
-                message = "Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references\n \n".format(
-                    query)
-                mesage = message + \
-                    '\n---------------------\n'.join(list_return)
-                dispatcher.utter_message(mesage)
+                    list_return.append('- '+en+'\n'+vi)
+                dispatcher.utter_message("Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references\n \n".format(
+                    query))
+                for item in list_return:
+                    dispatcher.utter_message(item)
                 return [SlotSet("phrase_to_tracau", None)]
         parsed_html = BeautifulSoup(html, features="lxml")
         if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
@@ -441,28 +444,27 @@ class ActionWritingCheck(Action):
         # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
         # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
         try:
-            text = tracker.latest_message['entities'][0]['value'].strip(
-                '"').strip()
+            entities = [entity['value']
+                        for entity in tracker.latest_message['entities'] if entity['entity'] == 'text']
+            text = max(entities, key=lambda x: len(x))
+            text = text.strip('"').strip()
         except:
             dispatcher.utter_message(
                 "Please wrap the text in double quotation mark \" \"")
             return [AllSlotsReset()]
-        message = f'Here are some mistakes that I found:\n\n'
-        message = message + "------------\n\n"
-        message = message + print_errors(text, language_tool, gg) + '\n\n'
-        message = message + "------------\n\n"
-        message = message + f"Here is the text after correction:\n\n"
-        message = message + "------------\n\n"
-        message = message + print_errors(text, language_tool, gg) + '\n'
-        message = message + "------------\n \n"
-        message = message + f"Here is the text after correction:\n"
-        message = message + "------------\n"
-        message = message + \
-            correct_gingerit(correct_language_tool(
-                text, language_tool), gg) + "\n\n"
-        message = message + "------------\n\n"
-        message = message + "Please keep in mind that these corrections may be wrong and should only be used as a reference"
-        dispatcher.utter_message(message)
+        try:
+            dispatcher.utter_message('Here are some mistakes that I found:')
+            errors = print_errors(text, language_tool, gg)
+            dispatcher.utter_message(errors)
+            dispatcher.utter_message("Here is the text after correction:")
+            corrected_text = correct_language_tool(
+                correct_gingerit(text, gg), language_tool)
+            dispatcher.utter_message(corrected_text)
+            dispatcher.utter_message(
+                "Please keep in mind that these corrections may be wrong and should only be used as a reference")
+        except:
+            dispatcher.utter_message(
+                "Hooray! I did not find any errors in your provided text.")
         return [AllSlotsReset()]
 
 
@@ -477,16 +479,24 @@ class ActionWritingCheckFromSlot(Action):
         # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
         text = tracker.get_slot("text").strip(
             '"').strip()
-        message = f'Here are some mistakes that I found:\n'
-        message = message + "------------\n\n"
-        message = message + print_errors(text, language_tool, gg) + '\n'
-        message = message + "------------\n \n"
-        message = message + f"Here is the text after correction:\n"
-        message = message + "------------\n"
-        message = message + \
-            correct_gingerit(correct_language_tool(
-                text, language_tool), gg) + "\n"
-        message = message + "------------\n"
-        message = message + "Please keep in mind that these corrections may be wrong and should only be used as a reference"
-        dispatcher.utter_message(message)
+        try:
+            response = rq.get(text)
+            dispatcher.utter_message(
+                "Sorry, I don't support images yet! But let's wait for Pham Ngoc Man to implement an OCR function then I'll be ready!")
+            #dispatcher.utter_message("Your url is: {0}".format(text))
+        except:
+            try:
+                dispatcher.utter_message(
+                    'Here are some mistakes that I found:')
+                errors = print_errors(text, language_tool, gg)
+                dispatcher.utter_message(errors)
+                dispatcher.utter_message("Here is the text after correction:")
+                corrected_text = correct_language_tool(
+                    correct_gingerit(text, gg), language_tool)
+                dispatcher.utter_message(corrected_text)
+                dispatcher.utter_message(
+                    "Please keep in mind that these corrections may be wrong and should only be used as a reference")
+            except:
+                dispatcher.utter_message(
+                    "Hooray! I did not find any errors in your provided text.")
         return [AllSlotsReset()]
