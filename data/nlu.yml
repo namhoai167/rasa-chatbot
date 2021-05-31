@@ -65,7 +65,7 @@ nlu:
 
   # FILL BLANK (Developing)
   - intent: request_fill_blank
-    example: |
+    examples: |
       - Fill in the blank
       - What is the missing word in this sentence?
 
