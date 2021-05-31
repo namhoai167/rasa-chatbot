@@ -115,7 +115,7 @@ def print_errors(text, language_tool, gg):
     gg_errors = [gg.parse(t)['corrections'] for t in sub_texts]
     for subtext_gg_errors in gg_errors:
         unified_gg_errors.append(set(
-            (error['correct'], error['start'], error['end']) for error in subtext_gg_errors))
+            (error['correct'], error['start'], error['start'] + len(error['text']) - 1) for error in subtext_gg_errors))
     # print(unified_gg_errors)
     # print('\n')
     # Merge two lists of sets (union)
