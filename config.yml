@@ -1,5 +1,8 @@
----
+# Configuration for Rasa NLU.
+# https://rasa.com/docs/rasa/nlu/components/
 language: en
+
+# https://rasa.com/docs/rasa/tuning-your-model/
 pipeline:
   - name: SpacyNLP
     # language model to load

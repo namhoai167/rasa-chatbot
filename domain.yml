@@ -1,6 +1,17 @@
 ---
 version: '2.0'
+
 intents:
+  - greet
+  - goodbye
+  - thank
+  - affirm
+  - deny
+  - bot_challenge
+
+# FILL BLANK (Developing)
+  - request_fill_blank
+
 # TOEIC READING PART 5
 # - reply_with_multiple_choice
   - request_multiple_choice_sentence_completion:
@@ -8,16 +19,18 @@ intents:
   - multiple_choice_sentence_completion:
       ignore_entities:
         - phrase_to_tracau
-        - text
+        - text_for_correction
       use_entities:
         - sentence
         - answer_a
         - answer_b
         - answer_c
         - answer_d
+
 # BLENDERBOT
   - nlu_fallback:
       use_entities: []
+
 # TRACAU
   - request_to_tracau:
       ignore_entities:
@@ -26,11 +39,12 @@ intents:
         - answer_b
         - answer_c
         - answer_d
-        - text
+        - text_for_correction
       use_entities:
         - phrase_to_tracau
   - request_to_tracau_without_phrase:
       use_entities: []
+
 # SPELLING AND GRAMMAR CORRECTION
   - writing_check_without_text:
       use_entities: []
@@ -43,15 +57,17 @@ intents:
         - answer_c
         - answer_d
       use_entities:
-        - text
+        - text_for_correction
+
 entities:
   - phrase_to_tracau
-  - text
+  - text_for_correction
   - sentence
   - answer_a
   - answer_b
   - answer_c
   - answer_d
+
 actions:
   - action_fallback_chat
   - action_solve_multiple_choice_sentence_completion
@@ -61,7 +77,32 @@ actions:
   - action_request_to_tracau_from_slot
   - action_writing_check
   - action_writing_check_from_slot
+
 responses:
+  utter_greet:
+    - text: "Hey! How are you?"
+  utter_thank:
+    - text: "You're welcome."
+    - text: "You are welcome."
+    - text: "No problem."
+    - text: "My pleasure."
+    - text: "It’s my pleasure."
+    - text: "Glad to help."
+    - text: "Sure!"
+  utter_cheer_up:
+    - text: "Here is something to cheer you up:"
+      image: "https://i.imgur.com/nGF1K8f.jpg"
+  utter_did_that_help:
+    - text: "Did that help you?"
+  utter_happy:
+    - text: "Great, carry on!"
+  utter_goodbye:
+    - text: "Bye"
+    - text: "Goodbye"
+    - text: "See you later"
+  utter_iamabot:
+    - text: "I am a bot, built on Rasa framework."
+    - text: "I am a bot, built with ML and Deep learning."
   utter_ask_sentence:
     - text: 'Please give me the incomplete sentence.'
   utter_ask_answer_a:
@@ -78,10 +119,11 @@ responses:
     - text: 'Please give me the incomplete sentence and at least 2 possible choices.'
   utter_comfirm_sentence_choices_values:
     - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
-  utter_ask_phrase:
+  utter_ask_phrase_to_tracau:
     - text: 'Sure! Which phrase do you want to ask?'
   utter_ask_text_for_correction:
     - text: 'Sure! Give me the text you want to analyse.'
+
 forms:
   english_multiple_choice_sentence_completion_form:
     required_slots:
@@ -111,14 +153,15 @@ forms:
         - type: from_text
   writing_check_form:
     required_slots:
-      text:
+      text_for_correction:
         - type: from_text
+
 slots:
   phrase_to_tracau:
     auto_fill: False
     influence_conversation: false
     type: text
-  text:
+  text_for_correction:
     auto_fill: False
     influence_conversation: false
     type: text
