@@ -118,15 +118,13 @@ nlu:
       - {(.*)}
       - (?<=:).*
   - intent: writing_check
-    examples: >
+    examples: |
       - Can u check the grammar and spelling of this text for me: ["LanguageTool is your intelligent writing assistant for all common browsers and word processors."](text_for_correction)
-      - Analyse this text: [(Dear Jane, I was delighted to read your lettered last week. It's always a pleasure to receive the latest news and to hear that you and your family had a great summer. We spent last week at the beach and had so much fun on the sand and in the water exploring the coast we weren't prepared for the rains that came at the end of the vacation. The best parts of the trip was the opportunities to sightseer and relax. My kids are back in school to. I find there are
-      fewer)](text_for_correction)
+      - Analyse this text: [(Dear Jane, I was delighted to read your lettered last week. It's always a pleasure to receive the latest news and to hear that you and your family had a great summer. We spent last week at the beach and had so much fun on the sand and in the water exploring the coast we weren't prepared for the rains that came at the end of the vacation. The best parts of the trip was the opportunities to sightseer and relax. My kids are back in school to. I find there are fewer)](text_for_correction)
       - Fix this paragraph for me [[Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum](text_for_correction)
       - find mistakes in my essay ["Envirionment In order to increase the consumption of the tins with conscious of public opinion, Simsek Ambalaj believes in competing with quality to be the products of highquality and precise on the shelves. Only in this condition, the tendency to the alternative packaging solutions will decrease and sources of the country will be used more economical and productive because of the quick recycling of steel packages"](text_for_correction)
       - assist me with this paragraph:[ Envirionment In order to increase the consumption of the tins with conscious of public opinion, Simsek Ambalaj believes in competing with quality to be the products of highquality and precise on the shelves. Only in this condition, the tendency to the alternative packaging solutions will decrease and sources of the country will be used more economical and productive because of the quick recycling of steel packages](text_for_correction)
-      - help me with this writing homework [{LanguageTool is your intelligent writing assistant for all common browsers and word processors. Write or paste your text here too have it checked continuously. Errors will be underlined in different colours: we will mark seplling errors with red underilnes. Furthermore grammar error's are highlighted in yellow. LanguageTool also marks style issues in a reliable manner by underlining them in blue. did you know that you can sea synonyms by
-      double}](text_for_correction)
+      - help me with this writing homework [{LanguageTool is your intelligent writing assistant for all common browsers and word processors. Write or paste your text here too have it checked continuously. Errors will be underlined in different colours: we will mark seplling errors with red underilnes. Furthermore grammar error's are highlighted in yellow. LanguageTool also marks style issues in a reliable manner by underlining them in blue. did you know that you can sea synonyms by double}](text_for_correction)
       - chech this text 4 me:[ Hello, My name is Susan. I'm forteen and I life in Germany. My hobbys are go to discos, sometimes I hear music in the radio.](text_for_correction)
   - intent: writing_check_without_text
     examples: |
@@ -142,10 +140,6 @@ nlu:
   
   - intent: greet
     examples: |
-      - hey
-      - heya
-      - hallo
-      - hello
       - hello buddy
       - hello there
       - hi
@@ -155,11 +149,134 @@ nlu:
       - hey there
       - let's go
       - hey dude
-      - good morning
-      - good evening
-      - good afternoon
-      - good day
-      
+      - Bom dia
+      - Bonjour
+      - Guten Morgen
+      - HELLO
+      - HEY
+      - HEllo
+      - HI
+      - HI Sara
+      - Hallo
+      - Hei
+      - Hellllooooooo
+      - Hello
+      - Hello Bot
+      - Hello!
+      - Hey
+      - Hey bot
+      - Heya
+      - Heylo
+      - Hi
+      - Hi bot
+      - Hi man
+      - Hi rasa
+      - Hi sara
+      - Hi sara..
+      - Hi there
+      - Hi!
+      - Hi'
+      - Hi,
+      - Hi, bot
+      - Hieee
+      - Hieeeeeeeeeeeee
+      - Hola
+      - I said, helllllloooooO!!!!
+      - Well hello there ;)
+      - What is up?
+      - Whats up
+      - Whats up my bot
+      - Whats up?
+      - ayyyy whaddup
+      - bonjour
+      - ey boss
+      - greet
+      - greetings
+      - hai
+      - hallo
+      - hallo sara
+      - halloo
+      - halloooo
+      - halo
+      - halo sara
+      - heeey
+      - heelio
+      - hell9o
+      - hellio
+      - hello
+      - hello Sara
+      - hello everybody
+      - hello friend
+      - hello hi
+      - hello is anybody there
+      - hello it is me again
+      - hello sweatheart
+      - hello sweet boy
+      - hello there
+      - hello world
+      - hello?
+      - hello
+      - hellooo
+      - helloooo
+      - helo
+      - hey
+      - hey bot
+      - hey bot!
+      - hey dude
+      - hey hey
+      - hey let's talk
+      - hey rasa
+      - hey sara
+      - hey ther
+      - hey there
+      - hey there boy
+      - hey there..
+      - hey, let's talk
+      - hey, sara!
+      - heya
+      - heyho
+      - heyo
+      - hhola
+      - hi
+      - hi !
+      - hi Mister
+      - hi again
+      - hi folks
+      - hi friend
+      - hi friends
+      - hi hi
+      - hi pal!
+      - hi sara
+      - hi there
+      - hi there it's me
+      - hi!
+      - hi.........................................................
+      - hi?
+      - hieee
+      - hii
+      - hiihihi
+      - hiii
+      - hlo
+      - hola
+      - howdy
+      - i am 
+      - jojojo
+      - jop
+      - konichiwa
+      - merhaba
+      - ola sara
+      - rasa hello
+      - salut
+      - sup
+      - wasssup
+      - wasssup!
+      - what up
+      - whats popping
+      - whats up
+      - yo
+      - yoo
+      - ssup?
+      - helleo
   - intent: goodbye
     examples: |
       - c u
@@ -175,41 +292,120 @@ nlu:
       - have a great day
       - talk to you later
       - cya
-
+      - Bye
+      - Bye bye
+      - adios
+      - adios?
+      - bye .
+      - bye :P
+      - bye bot
+      - bye bye
+      - bye bye bot
+      - bye for now
+      - bye udo
+      - bye was nice talking to you
+      - bye!
+      - byee
+      - catch you later
+      - ciao
+      - cya
+      - farewell
+      - good bye
+      - good bye rasa bot!
+      - good night
+      - goodbye
+      - goodbye.
+      - goodnight
+      - gotta go
+      - k byyye #slay
+      - ok Bye
+      - ok bye
+      - ok, bye
+      - ok.bye
+      - see u later
+      - see ya
+      - see you
+      - see you . bye
+      - take care
+      - then bye
+      - tlak to you later
+      - toodle-oo
+      - Exit
+      - Close this talk
+      - byr
   - intent: thank
     examples: |
       - thanks
       - thanhk you
       - tks
+      - Cool. Thanks
+      - Great, thanks
+      - Thank you
+      - Thank you Sara
+      - Thank you so much
+      - Thank's!
+      - Thanks
+      - Thanks bot
+      - Thanks for that
+      - Thanks!
+      - amazing, thanks
+      - cheers
+      - cheers bro
+      - cool thank you
+      - cool thanks
+      - cool, thanks
+      - danke
+      - great thanks
+      - ok thanks
+      - ok thanks ellie
+      - ok thanks!
+      - perfect thank you
+      - thank u
+      - thank you
+      - thank you anyways
+      - thanks
+      - thanks a bunch for everything
+      - thanks a lot
+      - thanks for forum link, I'll check it out
+      - thanks for the help
+      - thanks this is great news
+      - thanks you
+      - thanks!
+      - thankyou
+      - thnks
+      - thx
+      - yes thanks
+      - thanks for your information
+      - thanks f
 
-  - intent: affirm
-    examples: |
-      - yes
-      - yep
-      - yeah
-      - y
-      - ok
-      - indeed
-      - of course
-      - that's right
-      - that sounds good
-      - correct
-      - great
-      - perfect
+#  - intent: affirm
+#    examples: |
+#      - yes
+#      - yep
+#      - yeah
+#      - y
+#      - ok
+#      - indeed
+#      - of course
+#      - that's right
+#      - that sounds good
+#      - correct
+#      - great
+#      - perfect
 
-  - intent: deny
-    examples: |
-      - no
-      - nope
-      - n
-      - nah
-      - never
-      - I don't think so
-      - don't like that
-      - no way
-      - not really
-      - not true
-      - no thanks
+#  - intent: deny
+#    examples: |
+#      - no
+#      - nope
+#      - n
+#      - nah
+#      - never
+#      - I don't think so
+#      - don't like that
+#      - no way
+#      - not really
+#      - not true
+#      - no thanks
 
   - intent: bot_challenge
     examples : |
@@ -221,12 +417,27 @@ nlu:
       - am I talking to an actual person?
       - you're a bot aren't you?
       - are you even a real person?
+      - Are you the bot?
+      - Hi there, are you the bot?
+      - are you a BOT
+      - are you a robot
+      - are you ai
+      - are you artificial
+      - are you artificial intelligence
+      - are you bot
+      - are you sure that you're a bot?
+      - bot?
 
   ############
   # BLENDERBOT
   ############
   - intent: nlu_fallback
     examples: |
+      - good morning
+      - hi can you speak ?
+      - good evening
+      - good afternoon
+      - good day
       - How did you come into being?
       - How did you come to be?
       - How exactly were you devised?
@@ -263,12 +474,11 @@ nlu:
       - in what way were you made?
       - so how were you made?
       - what are you made of
-      - Ahoy matey how are you?
       - Are you ok?
       - Do you feel good?
       - Do you have a great day?
-      - HI Sara, what are you up to?
-      - Hi Sara! How are you?
+      - HI, what are you up to?
+      - Hi! How are you?
       - How are You?
       - How are things?
       - How are you
@@ -354,16 +564,6 @@ nlu:
       - when is your birthday?
       - when were you born?
       - when you were bon
-      - Are you the bot?
-      - Hi there, are you the bot?
-      - are you a BOT
-      - are you a robot
-      - are you ai
-      - are you artificial
-      - are you artificial intelligence
-      - are you bot
-      - are you sure that you're a bot?
-      - bot?
       - What can I ask you?
       - What can I do?
       - What can you demo

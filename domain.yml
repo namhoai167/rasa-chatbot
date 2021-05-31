@@ -4,8 +4,8 @@ intents:
   - greet
   - goodbye
   - thank
-  - affirm
-  - deny
+#  - affirm
+#  - deny
   - bot_challenge
 
 # FILL BLANK (Developing)
@@ -79,32 +79,37 @@ actions:
 
 responses:
   utter_greet:
-    - text: "Hey! How are you?"
+    - text: Hey! How are you?
+    - text: How's it going! Nice to meet you!
+    - text: Hey!
+    - text: Hi!
+    - text: Hey there!
   utter_thank:
-    - text: "You're welcome."
-    - text: "You are welcome."
-    - text: "No problem."
-    - text: "My pleasure."
-    - text: "It’s my pleasure."
-    - text: "Glad to help."
-    - text: "Sure!"
-  utter_cheer_up:
-    - text: "Here is something to cheer you up:"
-      image: "https://i.imgur.com/nGF1K8f.jpg"
-  utter_did_that_help:
-    - text: "Did that help you?"
-  utter_happy:
-    - text: "Great, carry on!"
+    - text: You're welcome.
+    - text: You are welcome.
+    - text: No problem.
+    - text: My pleasure.
+    - text: It’s my pleasure.
+    - text: Glad to help.
+#  utter_cheer_up:
+#    - text: "Here is something to cheer you up:"
+#      image: "https://i.imgur.com/nGF1K8f.jpg"
+#  utter_did_that_help:
+#    - text: "Did that help you?"
+#  utter_happy:
+#    - text: "Great, carry on!"
   utter_goodbye:
-    - text: "Bye"
-    - text: "Goodbye"
-    - text: "See you later"
+    - text: Bye
+    - text: Goodbye
+    - text: See you later
   utter_iamabot:
-    - text: "I am a bot, built on Rasa framework."
-    - text: "I am a bot, built with ML and Deep learning."
+    - text: I am a bot, built on Rasa framework. I'm here to help you on your journey to improve your English.
+    - text: I am a bot, built with ML and Deep learning. I'm here to assist you in your efforts to improve your English.
+    - text: I am a bot that was created using ML and Deep Learning. I'm here to help you with your English-improvement endeavors.
+    - text: I am a Rasa framework-based bot. I'm here to assist you on your English-improvement quest.
   utter_ask_sentence:
-    - text: Please give me the incomplete sentence.
-    - text: Please give me the unfinished sentence
+    - text: Please give me the incomplete sentence. Remember to mark the word position needed to be filled with underscores
+    - text: Please provide me the missing sentence. Remember to use underscores to indicate the word word that needs to be filled.
     - text: OK! Give me the paragraph with an underscore.
     - text: OKAY! Give me the paragraph with an underscore in it.
   utter_ask_answer_a:
@@ -116,7 +121,7 @@ responses:
   utter_ask_answer_d:
     - text: And finally the answer D.
   utter_ask_choices:
-    - text: Now please give me at least 2 possible choices.
+    - text: Now please give me at least 2 possible choices. You can put your answers between commas or use this formula (A)answer A(B)answer B...
   utter_ask_sentence_and_choices:
     - text: Please give me the incomplete sentence and at least 2 possible choices.
   utter_comfirm_sentence_choices_values:
