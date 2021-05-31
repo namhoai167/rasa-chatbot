@@ -477,7 +477,7 @@ class ActionWritingCheckFromSlot(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
         # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
-        text = tracker.get_slot("text").strip(
+        text = tracker.get_slot("text_for_correction").strip(
             '"').strip()
         try:
             response = rq.get(text)
