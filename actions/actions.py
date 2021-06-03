@@ -206,6 +206,10 @@ def ocr(img_url) -> str:
     image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
     image = cv2.medianBlur(image, 3)
     image = deskew(image)
+    image = cv2.bitwise_not(image)
+    kernel = np.ones((2,2),np.uint8)
+    image = cv2.erode(image, kernel, iterations=1)
+    image = cv2.bitwise_not(image)
     text = str(((pytesseract.image_to_string(image))))
     return text
 
