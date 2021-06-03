@@ -48,14 +48,14 @@ rules:
   ########
   # TRACAU
   ########
-  - rule: Retrieve phrase then send to TraCau API and get the respond
-    steps:
-      - intent: request_to_tracau
-      - action: action_request_to_tracau
+#  - rule: Retrieve phrase then send to TraCau API and get the respond
+#    steps:
+#      - intent: request_to_tracau
+#      - action: action_request_to_tracau
 
   - rule: Store slot for phrase
     steps:
-      - intent: request_to_tracau_without_phrase
+      - intent: request_to_tracau
       - action: request_to_tracau_form
       - active_loop: request_to_tracau_form
 
@@ -67,21 +67,21 @@ rules:
       - active_loop: null
       - slot_was_set:
           - requested_slot: null
-      - action: action_request_to_tracau_from_slot
+      - action: action_request_to_tracau
 
   #################################
   # SPELLING AND GRAMMAR CORRECTION
   #################################
   - rule: Store slot for text
     steps:
-      - intent: writing_check_without_text
+      - intent: writing_check
       - action: writing_check_form
       - active_loop: writing_check_form
 
-  - rule: Retrieve text then correct using both LanguageTool and Gingerit
-    steps:
-      - intent: writing_check
-      - action: action_writing_check
+#  - rule: Retrieve text then correct using both LanguageTool and Gingerit
+#    steps:
+#      - intent: writing_check
+#      - action: action_writing_check
 
   - rule: Submit and sent to Language Tool and Gingerit to correct
     condition:
@@ -91,7 +91,7 @@ rules:
       - active_loop: null
       - slot_was_set:
           - requested_slot: null
-      - action: action_writing_check_from_slot
+      - action: action_writing_check
 
   - rule: Say goodbye anytime the user says goodbye
     steps:
@@ -102,3 +102,8 @@ rules:
     steps:
       - intent: bot_challenge
       - action: utter_iamabot
+  
+  - rule: Greet when user greets
+    steps:
+      - intent: greet
+      - action: utter_greet

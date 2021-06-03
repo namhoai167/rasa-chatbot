@@ -4,6 +4,9 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
+import cv2
+from skimage import io
+import pytesseract
 from gingerit.gingerit import GingerIt
 import language_tool_python
 from typing import Any, Text, Dict, List
@@ -139,6 +142,72 @@ def print_errors(text, language_tool, gg):
                 sub_texts[idx] = sub_texts[idx][:start_idx] + "{" + sub_texts[idx][start_idx:end_idx +
                                                                                    1] + "}" + """ (Did you mean: {0})""".format(error[0]) + sub_texts[idx][end_idx+1:]
     return split_into_sentences(" ".join(sub_texts))
+
+
+def getSkewAngle(cvImage) -> float:
+    # Prep image, copy, convert to gray scale, blur, and threshold
+    newImage = cvImage.copy()
+    #gray = cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(newImage, (9, 9), 0)
+    thresh = cv2.threshold(
+        blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
+    # Apply dilate to merge text into meaningful lines/paragraphs.
+    # Use larger kernel on X axis to merge characters into single line, cancelling out any spaces.
+    # But use smaller kernel on Y axis to separate between different blocks of text
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 5))
+    dilate = cv2.dilate(thresh, kernel, iterations=2)
+
+    # Find all contours
+    contours, hierarchy = cv2.findContours(
+        dilate, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)
+    for c in contours:
+        rect = cv2.boundingRect(c)
+        x, y, w, h = rect
+        cv2.rectangle(newImage, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+    # Find largest contour and surround in min area box
+    largestContour = contours[0]
+    #print (len(contours))
+    minAreaRect = cv2.minAreaRect(largestContour)
+    #cv2.imwrite("temp/boxes.jpg", newImage)
+    # Determine the angle. Convert it to the value that was originally used to obtain skewed image
+    angle = minAreaRect[-1]
+    if angle < -45:
+        angle = 90 + angle
+    return -1.0 * angle
+# Rotate the image around its center
+
+
+def rotateImage(cvImage, angle: float):
+    newImage = cvImage.copy()
+    (h, w) = newImage.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    newImage = cv2.warpAffine(
+        newImage, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return newImage
+
+
+def deskew(cvImage):
+    angle = getSkewAngle(cvImage)
+    return rotateImage(cvImage, -1.0 * angle)
+
+
+def ocr(img_url) -> str:
+    image = io.imread(img_url)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    thresh, image = cv2.threshold(image, 210, 230, cv2.THRESH_BINARY)
+    kernel = np.ones((1, 1), np.uint8)
+    image = cv2.dilate(image, kernel, iterations=1)
+    kernel = np.ones((1, 1), np.uint8)
+    image = cv2.erode(image, kernel, iterations=1)
+    image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
+    image = cv2.medianBlur(image, 3)
+    image = deskew(image)
+    text = str(((pytesseract.image_to_string(image))))
+    return text
 
 
 class ActionOnFallBack(Action):
@@ -291,7 +360,7 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndchoices(Ac
 '''
 
 
-class ActionRequestToTracau(Action):
+'''class ActionRequestToTracau(Action):
     def name(self) -> Text:
         return "action_request_to_tracau"
 
@@ -365,76 +434,83 @@ class ActionRequestToTracau(Action):
         dispatcher.utter_message(text='\n'.join(
             [string for string in l2 if string]))
         return [AllSlotsReset()]
+'''
 
 
-class ActionRequestToTracauFromSlot(Action):
+class ActionRequestToTracau(Action):
     def name(self) -> Text:
-        return "action_request_to_tracau_from_slot"
+        return "action_request_to_tracau"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        query = tracker.get_slot("phrase_to_tracau").strip(
-            '"').strip()
-        url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
         try:
-            respond = rq.get(url).json()
-            html = respond['tratu'][0]['fields']['fulltext']
-        except:
-            lemmatizer = WordNetLemmatizer()
-            query = lemmatizer.lemmatize(query)
+            query = tracker.get_slot("phrase_to_tracau").strip(
+                '"').strip().strip('(').strip(')').strip('[').strip(']').strip("'").strip('{').strip('}')
             url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
-            respond = rq.get(url).json()
             try:
+                respond = rq.get(url).json()
                 html = respond['tratu'][0]['fields']['fulltext']
             except:
-                list_sentences = [sent['fields']
-                                  for sent in respond['sentences']]
-                list_return = []
-                for sentence in list_sentences:
-                    en = BeautifulSoup(
-                        sentence['en'], features="lxml").getText()
-                    en = " ".join(en.split())
-                    vi = sentence['vi']
-                    vi = " ".join(vi.split())
-                    list_return.append('- '+en+'\n'+vi)
-                dispatcher.utter_message("Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references\n \n".format(
-                    query))
-                for item in list_return:
-                    dispatcher.utter_message(item)
-                return [SlotSet("phrase_to_tracau", None)]
-        parsed_html = BeautifulSoup(html, features="lxml")
-        if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
-            l = [x for x in parsed_html.find("article", {
-                                             'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
-        elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
-            l = [x for x in parsed_html.find("article", {
-                                             'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
-        elif parsed_html.find("article", {'data-tab-name': "Anh - Anh"}):
-            l = [x for x in parsed_html.find("article", {
-                                             'data-tab-name': "Anh - Anh"}).find("div", {'class': "dict--content"}).children]
-        else:
-            dispatcher.utter_message(
-                text="Sorry, I can't find the phrase {0} in the database".format(query))
-            return [SlotSet("phrase_to_tracau", None)]
-        l2 = []
-        for element in l:
-            if element.name == 'dtrn':
-                definition_text = element.find(
-                    'dtrn', text=True, recursive=False)
-                l2.append(definition_text)
-                for child in element.children:
-                    if child.string:
-                        l2.append(child.string)
+                lemmatizer = WordNetLemmatizer()
+                query = lemmatizer.lemmatize(query)
+                url = "https://api.tracau.vn/WBBcwnwQpV89/s/" + query + "/en"
+                respond = rq.get(url).json()
+                try:
+                    html = respond['tratu'][0]['fields']['fulltext']
+                except:
+                    list_sentences = [sent['fields']
+                                    for sent in respond['sentences']]
+                    list_return = []
+                    for sentence in list_sentences:
+                        en = BeautifulSoup(
+                            sentence['en'], features="lxml").getText()
+                        en = " ".join(en.split())
+                        vi = sentence['vi']
+                        vi = " ".join(vi.split())
+                        list_return.append('- '+en+'\n'+vi)
+                    dispatcher.utter_message("Hmm... Although I can't find any definition of the phrase \"{0}\" but I managed to find some examples for references\n \n".format(
+                        query))
+                    for item in list_return:
+                        dispatcher.utter_message(item)
+                    return [AllSlotsReset()]
+            parsed_html = BeautifulSoup(html, features="lxml")
+            if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
+                l = [x for x in parsed_html.find("article", {
+                                                'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
+            elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
+                l = [x for x in parsed_html.find("article", {
+                                                'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
+            elif parsed_html.find("article", {'data-tab-name': "Anh - Anh"}):
+                l = [x for x in parsed_html.find("article", {
+                                                'data-tab-name': "Anh - Anh"}).find("div", {'class': "dict--content"}).children]
+            elif parsed_html.find("article", {'data-tab-name': "Anh - Việt"}):
+                l = [x for x in parsed_html.find("article", {
+                                                'data-tab-name': "Anh - Việt"}).find("div", {'class': "dict--content"}).children]
             else:
-                l2.append(element.getText())
+                dispatcher.utter_message(
+                    text="Sorry, I can't find the phrase {0} in the database".format(query))
+                return [AllSlotsReset()]
+            l2 = []
+            for element in l:
+                if element.name == 'dtrn':
+                    definition_text = element.find(
+                        'dtrn', text=True, recursive=False)
+                    l2.append(definition_text)
+                    for child in element.children:
+                        if child.string:
+                            l2.append(child.string)
+                else:
+                    l2.append(element.getText())
 
-        dispatcher.utter_message(text='\n'.join(
-            [string for string in l2 if string]))
+            dispatcher.utter_message(text='\n'.join(
+                [string for string in l2 if string]))
+        except:
+            dispatcher.utter_message("Sorry, I have some trouble understanding you :( Please rephrase your question.")
         return [AllSlotsReset()]
 
 
-class ActionWritingCheck(Action):
+'''class ActionWritingCheck(Action):
     def name(self) -> Text:
         return "action_writing_check"
 
@@ -466,37 +542,49 @@ class ActionWritingCheck(Action):
             dispatcher.utter_message(
                 "Hooray! I did not find any errors in your provided text.")
         return [AllSlotsReset()]
+'''
 
-
-class ActionWritingCheckFromSlot(Action):
+class ActionWritingCheck(Action):
     def name(self) -> Text:
-        return "action_writing_check_from_slot"
+        return "action_writing_check"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
-        # After install gingerit, go to /python3.8/site-packages/gingerit/gingerit.py and add <"end": end,> to line 51
-        text = tracker.get_slot("text_for_correction").strip(
-            '"').strip()
         try:
-            response = rq.get(text)
-            dispatcher.utter_message(
-                "Sorry, I don't support images yet! But let's wait for Pham Ngoc Man to implement an OCR function then I'll be ready!")
-            #dispatcher.utter_message("Your url is: {0}".format(text))
-        except:
+            text = tracker.get_slot("text_for_correction").strip()
             try:
-                dispatcher.utter_message(
-                    'Here are some mistakes that I found:')
-                errors = print_errors(text, language_tool, gg)
-                dispatcher.utter_message(errors)
-                dispatcher.utter_message("Here is the text after correction:")
-                corrected_text = correct_language_tool(
-                    correct_gingerit(text, gg), language_tool)
-                dispatcher.utter_message(corrected_text)
-                dispatcher.utter_message(
-                    "Please keep in mind that these corrections may be wrong and should only be used as a reference")
+                scanned_text = ocr(text)
+                try:
+                    dispatcher.utter_message(
+                        'Here are some mistakes that I found:')
+                    errors = print_errors(scanned_text, language_tool, gg)
+                    dispatcher.utter_message(errors)
+                    dispatcher.utter_message("Here is the text after correction:")
+                    corrected_text = correct_language_tool(
+                        correct_gingerit(scanned_text, gg), language_tool)
+                    dispatcher.utter_message(corrected_text)
+                    dispatcher.utter_message(
+                        "Please keep in mind that these corrections may be wrong and should only be used as a reference")
+                except:
+                    dispatcher.utter_message(
+                        "Hooray! I did not find any errors in your provided text.")
             except:
-                dispatcher.utter_message(
-                    "Hooray! I did not find any errors in your provided text.")
+                try:
+                    dispatcher.utter_message(
+                        'Here are some mistakes that I found:')
+                    errors = print_errors(text, language_tool, gg)
+                    dispatcher.utter_message(errors)
+                    dispatcher.utter_message("Here is the text after correction:")
+                    corrected_text = correct_language_tool(
+                        correct_gingerit(text, gg), language_tool)
+                    dispatcher.utter_message(corrected_text)
+                    dispatcher.utter_message(
+                        "Please keep in mind that these corrections may be wrong and should only be used as a reference")
+                except:
+                    dispatcher.utter_message(
+                        "Hooray! I did not find any errors in your provided text.")
+        except:
+            dispatcher.utter_message('Sorry, I have some trouble understanding you :( Please rephrase your question.')
         return [AllSlotsReset()]

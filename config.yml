@@ -27,7 +27,7 @@ pipeline:
   - name: DIETClassifier
     model_confidence: linear_norm
     constrain_similarities: True
-    epochs: 100
+    epochs: 30
     # can turn off cause we are using Regex Entity Extractor
     entity_recognition: False
 

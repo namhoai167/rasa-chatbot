@@ -41,12 +41,8 @@ intents:
         - text_for_correction
       use_entities:
         - phrase_to_tracau
-  - request_to_tracau_without_phrase:
-      use_entities: []
 
 # SPELLING AND GRAMMAR CORRECTION
-  - writing_check_without_text:
-      use_entities: []
   - writing_check:
       ignore_entities:
         - phrase_to_tracau
@@ -73,9 +69,7 @@ actions:
   - action_solve_multiple_choice_sentence_completion_with_list_of_choices
 #  - action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
   - action_request_to_tracau
-  - action_request_to_tracau_from_slot
   - action_writing_check
-  - action_writing_check_from_slot
 
 responses:
   utter_greet:
@@ -172,11 +166,11 @@ forms:
 
 slots:
   phrase_to_tracau:
-    auto_fill: false
+    auto_fill: true
     influence_conversation: true
     type: text
   text_for_correction:
-    auto_fill: false
+    auto_fill: true
     influence_conversation: true
     type: text
   sentence:
@@ -189,4 +183,4 @@ slots:
     type: text
 session_config:
   session_expiration_time: 60
-  carry_over_slots_to_new_session: true
+  carry_over_slots_to_new_session: false
