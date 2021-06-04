@@ -7,23 +7,26 @@ rules:
   - rule: Retrieve information about sentence and answers then feed into ELECTRA for prediction
     steps:
       - intent: multiple_choice_sentence_completion
-      - action: action_solve_multiple_choice_sentence_completion
+      # - action: action_solve_multiple_choice_sentence_completion
+      - action: multi_choice_sentence_completion_with_list_of_choices_form
+      - active_loop: multi_choice_sentence_completion_with_list_of_choices_form
 
-  - rule: Store slot for multiple choice sentence completion form with list of choices when user request
-    steps:
-      - intent: request_multiple_choice_sentence_completion
-      - action: english_multiple_choice_sentence_completion_with_list_of_choices_form
-      - active_loop: english_multiple_choice_sentence_completion_with_list_of_choices_form
+  # - rule: Store slot for multiple choice sentence completion form with list of choices when user request
+  #   steps:
+  #     - intent: request_multiple_choice_sentence_completion
+  #     - action: multi_choice_sentence_completion_with_list_of_choices_form
+  #     - active_loop: multi_choice_sentence_completion_with_list_of_choices_form
 
   - rule: Submit and solve multiple choice sentence completion form with list of choices
     condition:
-      - active_loop: english_multiple_choice_sentence_completion_with_list_of_choices_form
+      - active_loop: multi_choice_sentence_completion_with_list_of_choices_form
     steps:
-      - action: english_multiple_choice_sentence_completion_with_list_of_choices_form
+      - action: multi_choice_sentence_completion_with_list_of_choices_form
       - active_loop: null
       - slot_was_set:
           - requested_slot: null
-      - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
+      - action: action_solve_multiple_choice_sentence_completion
+      # - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
 
   #- rule: Submit and solve English multiple choice sentence completion form with list of question and choices
   #  condition:
@@ -102,3 +105,8 @@ rules:
     steps:
       - intent: bot_challenge
       - action: utter_iamabot
+
+  - rule: Reply help
+    steps:
+      - intent: help
+      - action: utter_help

@@ -27,7 +27,7 @@ pipeline:
   - name: DIETClassifier
     model_confidence: linear_norm
     constrain_similarities: True
-    epochs: 100
+    epochs: 30    # Muc nay loss giam nhung acc khong tang nua
     # can turn off cause we are using Regex Entity Extractor
     entity_recognition: False
 
@@ -40,22 +40,21 @@ pipeline:
     use_regexes: True
 
   - name: EntitySynonymMapper
-  - name: ResponseSelector
-    # model_confidence: linear_norm
-    # constrain_similarities: True
+  - name: ResponseSelector  # https://rasa.com/docs/rasa/2.3.x/migration-guide#machine-learning-components-1
+    model_confidence: linear_norm
+    constrain_similarities: True
     epochs: 100
 
   - name: FallbackClassifier
     threshold: 0.5
-    ambiguity_threshold: 0.1
-
+    # ambiguity_threshold: 0.1
 
 # Configuration for Rasa Core.
 # https://rasa.com/docs/rasa/core/policies/
 policies:
-  - name: MemoizationPolicy
-    constrain_similarities: True
-    epochs: 100
+  - name: MemoizationPolicy # This for stories.yml
+  - name: TEDPolicy         # Machine Learning Transformer Embedding Dialogue
     # model_confidence: linear_norm
     # constrain_similarities: True
-  - name: RulePolicy
+    epochs: 100
+  - name: RulePolicy        # This for rules

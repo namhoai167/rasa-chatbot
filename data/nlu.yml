@@ -4,13 +4,13 @@ nlu:
   ######################
   # TOEIC READING PART 5
   ######################
-  - intent: request_multiple_choice_sentence_completion
-    examples: |
-      - can you help me with this multiple choice sentence completion?
-      - please solve this sentence that has one blank spot
-      - give me the answer for this question of TOEIC reading part 5
-      - could you choose the word to complete this sentence
-      - could you choose the phrase that best completes the sentence from four choices
+  # - intent: request_multiple_choice_sentence_completion
+  #   examples: |
+  #     - can you help me with this multiple choice sentence completion?
+  #     - please solve this sentence that has one blank spot
+  #     - give me the answer for this question of TOEIC reading part 5
+  #     - could you choose the word to complete this sentence
+  #     - could you choose the phrase that best completes the sentence from four choices
 
   # - intent: reply_with_multiple_choice
   #   examples: |
@@ -30,32 +30,55 @@ nlu:
 
   - regex: sentence
     examples: |
-      - (?<=").*?(?="\(A\))
-      - (?<=:).*?(?=\(A\))
-  - regex: answer_a
+      - (?<=").*[-_]+.*?(?="\(A\))
+      - (?<=:).*[-_]+.*?(?=\(A\))
+  - regex: choices
     examples: |
       - (?<=\(A\)).*?(?=\(B\))
-  - regex: answer_b
-    examples: |
       - (?<=\(B\)).*?(?=\(C\))
-  - regex: answer_c
-    examples: |
       - (?<=\(C\)).*?(?=\(D\))
-  - regex: answer_d
-    examples: |
       - (?<=\(D\)).*
+  # - regex: answer_a
+  #   examples: |
+  #     - (?<=\(A\)).*?(?=\(B\))
+  # - regex: answer_b
+  #   examples: |
+  #     - (?<=\(B\)).*?(?=\(C\))
+  # - regex: answer_c
+  #   examples: |
+  #     - (?<=\(C\)).*?(?=\(D\))
+  # - regex: answer_d
+  #   examples: |
+  #     - (?<=\(D\)).*
   - intent: multiple_choice_sentence_completion
     examples: |
-      - can you help me with this multiple choice sentence completion:[ Mr. Holt's acceptance of the financial executive position is _ his satisfaction with the salary offer.](sentence)(A)[ in contrast to](answer_a)(B)[dependent on](answer_b)(C)[ as opposed to](answer_c)(D)[ on condition that](answer_d)
-      - please solve this sentence:[ The assets of Marble Faun Publishing Company _ last quarter when one of their main local distributors went out of business.](sentence)(A)[suffer](answer_a)(B)[suffers](answer_b)(C)[suffering](answer_c)(D)[suffered](answer_d)
-      - give me the answer for this question of TOEIC reading part 5:[ lndie film director Luke Steele will be in London for the premiere of _ new movie.](sentence)(A)[him](answer_a)(B)[his](answer_b)(C)[himself](answer_c)(D)[he](answer_d)
-      - could you choose the word to complete this sentence:[ Laboratory employees are expected to wear a name tag and carry identification at _ times.](sentence)(A)[full](answer_a)(B)[complete](answer_b)(C)[all](answer_c)(D)[total](answer_d)
-      - could you choose the phrase that best completes the sentence from four choices:[ The latest training _ contains tips on teaching a second language to international students:](sentence)(A)[method](answer_a)(B)[guide](answer_b)(C)[staff](answer_c)(D)[role](answer_d)
-      - "[Ursa Major Corp. has _ negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](sentence)"(A)[soon](answer_a)(B)[shortly](answer_b)(C)[recently](answer_c)(D)[yet](answer_d)
-      - "[Ms. Cho relayed her concerns about the company's financial situation while she _ a meeting with the manager.](sentence)"(A)[having](answer_a)(B)[will have](answer_b)(C)[was having](answer_c)(D)[has](answer_d)
-      - "[Whether it is _ to register for a student discount card depends on the needs of the individual.](sentence)"(A)[necessary](answer_a)(B)[necessarily](answer_b)(C)[necessitate](answer_c)(D)[necessity](answer_d)
-      - "[Even experienced clerks are encouraged to attend training _ to keep them updated on new ideas in the world of banking.](sentence)"(A)[materials](answer_a)(B)[sessions](answer_b)(C)[experiences](answer_c)(D)[positions](answer_d)
-      - "[Workers are advised not to operate certain machines by _ .](sentence)"(A)[they](answer_a)(B)[them](answer_b)(C)[their](answer_c)(D)[themselves](answer_d)
+      - can you help me with this multiple choice sentence completion
+      - please solve this sentence that has one blank spot
+      - give me the answer for this question of TOEIC reading part 5
+      - could you choose the word to complete this sentence
+      - could you choose the phrase that best completes the sentence from four choices
+      - can you help me with this multiple choice sentence completion: [Mr. Holt's acceptance of the financial executive position is -------his satisfaction with the salary offer.](sentence)(A)[ in contrast to](choices)(B)[dependent on](choices)(C)[ as opposed to](choices)(D)[ on condition that](choices)
+      - please solve this sentence: [The assets of Marble Faun Publishing Company------- last quarter when one of their main local distributors went out of business.](sentence)(A)[suffer](choices)(B)[suffers](choices)(C)[suffering](choices)(D)[suffered](choices)
+      - give me the answer for this question of TOEIC reading part 5: [lndie film director Luke Steele will be in London for the premiere of _ new movie.](sentence)(A)[him](choices)(B)[his](choices)(C)[himself](choices)(D)[he](choices)
+      - could you choose the word to complete this sentence: [Laboratory employees are expected to wear a name tag and carry identification at- times.](sentence)(A)[full](choices)(B)[complete](choices)(C)[all](choices)(D)[total](choices)
+      - could you choose the phrase that best completes the sentence from four choices:[ The latest training_ contains tips on teaching a second language to international students.](sentence)(A)[method](choices)(B)[guide](choices)(C)[staff](choices)(D)[role](choices)
+      - "[Ursa Major Corp. has _negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](sentence)"(A)[soon](choices)(B)[shortly](choices)(C)[recently](choices)(D)[yet](choices)
+      - "[Ms. Cho relayed her concerns about the company's financial situation while she __ a meeting with the manager.](sentence)"(A)[having](choices)(B)[will have](choices)(C)[was having](choices)(D)[has](choices)
+      - "[Whether it is _ to register for a student discount card depends on the needs of the individual.](sentence)"(A)[necessary](choices)(B)[necessarily](choices)(C)[necessitate](choices)(D)[necessity](choices)
+      - "[Even experienced clerks are encouraged to attend training -------to keep them updated on new ideas in the world of banking.](sentence)"(A)[materials](choices)(B)[sessions](choices)(C)[experiences](choices)(D)[positions](choices)
+      - "[Workers are advised not to operate certain machines by -------.](sentence)"(A)[they](choices)(B)[them](choices)(C)[their](choices)(D)[themselves](choices)
+  # - intent: multiple_choice_sentence_completion
+  #   examples: |
+  #     - can you help me with this multiple choice sentence completion: [Mr. Holt's acceptance of the financial executive position is -------his satisfaction with the salary offer.](sentence)(A)[ in contrast to](answer_a)(B)[dependent on](answer_b)(C)[ as opposed to](answer_c)(D)[ on condition that](answer_d)
+  #     - please solve this sentence: [The assets of Marble Faun Publishing Company------- last quarter when one of their main local distributors went out of business.](sentence)(A)[suffer](answer_a)(B)[suffers](answer_b)(C)[suffering](answer_c)(D)[suffered](answer_d)
+  #     - give me the answer for this question of TOEIC reading part 5: [lndie film director Luke Steele will be in London for the premiere of _ new movie.](sentence)(A)[him](answer_a)(B)[his](answer_b)(C)[himself](answer_c)(D)[he](answer_d)
+  #     - could you choose the word to complete this sentence: [Laboratory employees are expected to wear a name tag and carry identification at - times.](sentence)(A)[full](answer_a)(B)[complete](answer_b)(C)[all](answer_c)(D)[total](answer_d)
+  #     - could you choose the phrase that best completes the sentence from four choices:[ The latest training _ contains tips on teaching a second language to international students:](sentence)(A)[method](answer_a)(B)[guide](answer_b)(C)[staff](answer_c)(D)[role](answer_d)
+  #     - "[Ursa Major Corp. has _ negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](sentence)"(A)[soon](answer_a)(B)[shortly](answer_b)(C)[recently](answer_c)(D)[yet](answer_d)
+  #     - "[Ms. Cho relayed her concerns about the company's financial situation while she _ a meeting with the manager.](sentence)"(A)[having](answer_a)(B)[will have](answer_b)(C)[was having](answer_c)(D)[has](answer_d)
+  #     - "[Whether it is _ to register for a student discount card depends on the needs of the individual.](sentence)"(A)[necessary](answer_a)(B)[necessarily](answer_b)(C)[necessitate](answer_c)(D)[necessity](answer_d)
+  #     - "[Even experienced clerks are encouraged to attend training -------to keep them updated on new ideas in the world of banking.](sentence)"(A)[materials](answer_a)(B)[sessions](answer_b)(C)[experiences](answer_c)(D)[positions](answer_d)
+  #     - "[Workers are advised not to operate certain machines by -------.](sentence)"(A)[they](answer_a)(B)[them](answer_b)(C)[their](answer_c)(D)[themselves](answer_d)
     
   # GRAMMARTICAL CONJUGATION
   # - intent: request_grammatical_conjugation
@@ -74,11 +97,7 @@ nlu:
   ########
   - regex: phrase_to_tracau
     examples: |
-      - "(.*)"
-      - '(.*)'
-      - \[(.*)\]
-      - {(.*)}
-      - (?<=:).*
+      - "(.*)"|{(.*)}|'(.*)'|\[(.*)\]
   - intent: request_to_tracau
     examples: |
       - find me the usage of the phrase ["for all"](phrase_to_tracau)
@@ -112,11 +131,7 @@ nlu:
   #################################
   - regex: text_for_correction
     examples: |
-      - "(.*)"
-      - '(.*)'
-      - \[(.*)\]
-      - {(.*)}
-      - (?<=:).*
+      - "(.*)"|'(.*)'|\[(.*)\]|{(.*)}
   - intent: writing_check
     examples: |
       - Can u check the grammar and spelling of this text for me: ["LanguageTool is your intelligent writing assistant for all common browsers and word processors."](text_for_correction)
@@ -140,71 +155,10 @@ nlu:
   
   - intent: greet
     examples: |
-      - hello buddy
-      - hello there
-      - hi
-      - yo
-      - howdy
-      - moin
-      - hey there
-      - let's go
-      - hey dude
-      - Bom dia
-      - Bonjour
-      - Guten Morgen
       - HELLO
-      - HEY
-      - HEllo
-      - HI
-      - HI Sara
-      - Hallo
-      - Hei
-      - Hellllooooooo
       - Hello
-      - Hello Bot
       - Hello!
-      - Hey
-      - Hey bot
-      - Heya
-      - Heylo
-      - Hi
-      - Hi bot
-      - Hi man
-      - Hi rasa
-      - Hi sara
-      - Hi sara..
-      - Hi there
-      - Hi!
-      - Hi'
-      - Hi,
-      - Hi, bot
-      - Hieee
-      - Hieeeeeeeeeeeee
-      - Hola
-      - I said, helllllloooooO!!!!
-      - Well hello there ;)
-      - What is up?
-      - Whats up
-      - Whats up my bot
-      - Whats up?
-      - ayyyy whaddup
-      - bonjour
-      - ey boss
-      - greet
-      - greetings
-      - hai
-      - hallo
-      - hallo sara
-      - halloo
-      - halloooo
-      - halo
-      - halo sara
-      - heeey
-      - heelio
-      - hell9o
-      - hellio
       - hello
-      - hello Sara
       - hello everybody
       - hello friend
       - hello hi
@@ -215,68 +169,78 @@ nlu:
       - hello there
       - hello world
       - hello?
-      - hello
       - hellooo
       - helloooo
       - helo
-      - hey
-      - hey bot
-      - hey bot!
-      - hey dude
-      - hey hey
-      - hey let's talk
-      - hey rasa
-      - hey sara
-      - hey ther
-      - hey there
-      - hey there boy
-      - hey there..
-      - hey, let's talk
-      - hey, sara!
-      - heya
-      - heyho
-      - heyo
-      - hhola
+      - hello buddy
+      - hello there
       - hi
+      - HI
+      - Hi
+      - Hi bot
+      - Hi, bot
+      - Hi man
+      - Hi there
+      - Hi!
       - hi !
       - hi Mister
       - hi again
-      - hi folks
+      - hi folk
       - hi friend
-      - hi friends
       - hi hi
       - hi pal!
-      - hi sara
       - hi there
       - hi there it's me
       - hi!
-      - hi.........................................................
       - hi?
       - hieee
       - hii
       - hiihihi
       - hiii
-      - hlo
-      - hola
-      - howdy
-      - i am 
-      - jojojo
-      - jop
-      - konichiwa
-      - merhaba
-      - ola sara
-      - rasa hello
-      - salut
-      - sup
-      - wasssup
-      - wasssup!
-      - what up
-      - whats popping
-      - whats up
       - yo
-      - yoo
-      - ssup?
-      - helleo
+      - howdy
+      - moin
+      - hey there
+      - let's go
+      - hey dude
+      - HEY
+      - halo
+      - Hallo
+      - hallo
+      - halloo
+      - hal
+      - Hei
+      - Hellllooooooo
+      - Hello Bot
+      - Heylo
+      - I said, hellllllooooo!!!!
+      - Well hello there :)
+      - What is up?
+      - Whats up
+      - Whats up my bot
+      - Whats up?
+      - ay wassup
+      - ey boss
+      - hai
+      - heeey
+      - hey
+      - Hey
+      - Hey bot
+      - hey bot!
+      - hey hey
+      - hey let's talk
+      - hey, let's talk
+      - hey there
+      - hey there boy
+      - Heya
+      - heya
+      - heyho
+      - heyo
+      - howdy
+      - wassup
+      - wassup!
+      - what up
+      - whats up
   - intent: goodbye
     examples: |
       - c u
@@ -427,6 +391,36 @@ nlu:
       - are you bot
       - are you sure that you're a bot?
       - bot?
+      - who are you?
+      - who are u
+      - who r u
+      - who is this
+      - tell me who you are
+      - what is your name
+      - hi what is your name?
+      - what is your name?
+      - what are you?
+      - what is ur name
+      - what I can call you
+      - your name?
+      - tell me your name
+      - what's your name
+      - what is you name
+      - what is you name and where are you from
+  
+  - intent: help
+    examples: |
+      - I don't understand
+      - please help here
+      - what i need to do
+      - can you help me please
+      - Please help
+      - i do not understand
+      - Can you help me?
+      - Help
+      - what can you do
+      - what can u do
+      - what are you capable of
 
   ############
   # BLENDERBOT
@@ -527,7 +521,6 @@ nlu:
       - is everything okay
       - nah, I'm good - how are you doing?
       - okay hi how are you?
-      - wassup>
       - what about your day
       - what are you up to?
       - what's good
@@ -623,22 +616,6 @@ nlu:
       - are you from around here?
       - what country are you from?
       - where are from
-      - who are you?
-      - who are u
-      - who r u
-      - who is this
-      - tell me who you are
-      - what is your name
-      - hi what is your name?
-      - what is your name?
-      - what are you?
-      - what is ur name
-      - what I can call you
-      - your name?
-      - tell me your name
-      - what's your name
-      - what is you name
-      - what is you name and where are you from
       - I am asking you an out of scope question
       - 4 + 2 = ?
       - After registration I see that I have an available balance of 0.00000000. What does this balance represent?
@@ -684,8 +661,6 @@ nlu:
       - tell me a joke.
       - who is the most tallest in the world
       - who is me?
-      - can you help me please
-      - what can u do
       - make an essay
       - find me a dog.
       - y

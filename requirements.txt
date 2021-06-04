@@ -1,6 +1,7 @@
-#python==3.8.5
+# python==3.8.5
+default-jre
 rasa==2.6.2
-rasa-x==0.39.3
+# rasa-x==0.39.3
 sanic-jwt>=1.6.0
 torch==1.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 fitbert==0.9.0

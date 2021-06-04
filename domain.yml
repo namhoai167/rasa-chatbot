@@ -7,24 +7,26 @@ intents:
 #  - affirm
 #  - deny
   - bot_challenge
+  - help
 
 # FILL BLANK (Developing)
   - request_fill_blank
 
 # TOEIC READING PART 5
 # - reply_with_multiple_choice
-  - request_multiple_choice_sentence_completion:
-      use_entities: []
+  # - request_multiple_choice_sentence_completion:
+  #     use_entities: []
   - multiple_choice_sentence_completion:
       ignore_entities:
         - phrase_to_tracau
         - text_for_correction
       use_entities:
         - sentence
-        - answer_a
-        - answer_b
-        - answer_c
-        - answer_d
+        - choices
+        # - answer_a
+        # - answer_b
+        # - answer_c
+        # - answer_d
 
 # BLENDERBOT
   - nlu_fallback:
@@ -34,10 +36,11 @@ intents:
   - request_to_tracau:
       ignore_entities:
         - sentence
-        - answer_a
-        - answer_b
-        - answer_c
-        - answer_d
+        - choices
+        # - answer_a
+        # - answer_b
+        # - answer_c
+        # - answer_d
         - text_for_correction
       use_entities:
         - phrase_to_tracau
@@ -51,10 +54,11 @@ intents:
       ignore_entities:
         - phrase_to_tracau
         - sentence
-        - answer_a
-        - answer_b
-        - answer_c
-        - answer_d
+        - choices
+        # - answer_a
+        # - answer_b
+        # - answer_c
+        # - answer_d
       use_entities:
         - text_for_correction
 
@@ -62,10 +66,11 @@ entities:
   - phrase_to_tracau
   - text_for_correction
   - sentence
-  - answer_a
-  - answer_b
-  - answer_c
-  - answer_d
+  - choices
+  # - answer_a
+  # - answer_b
+  # - answer_c
+  # - answer_d
 
 actions:
   - action_fallback_chat
@@ -102,6 +107,8 @@ responses:
     - text: Bye
     - text: Goodbye
     - text: See you later
+  utter_help:
+    - text: Here what I can do \nSolve multiple choices sentence completion \nLookup a pharase \nText correction \nChatchit with suggestion
   utter_iamabot:
     - text: I am a bot, built on Rasa framework. I'm here to help you on your journey to improve your English.
     - text: I am a bot, built with ML and Deep learning. I'm here to assist you in your efforts to improve your English.
@@ -109,23 +116,23 @@ responses:
     - text: I am a Rasa framework-based bot. I'm here to assist you on your English-improvement quest.
   utter_ask_sentence:
     - text: Please give me the incomplete sentence. Remember to mark the word position needed to be filled with underscores
-    - text: Please provide me the missing sentence. Remember to use underscores to indicate the word word that needs to be filled.
-    - text: OK! Give me the paragraph with an underscore.
-    - text: OKAY! Give me the paragraph with an underscore in it.
-  utter_ask_answer_a:
-    - text: Now please give me the answer A.
-  utter_ask_answer_b:
-    - text: Now please, the answer B.
-  utter_ask_answer_c:
-    - text: Next please the answer C.
-  utter_ask_answer_d:
-    - text: And finally the answer D.
+    - text: Please provide me the incomplete sentence. Remember to use underscores to indicate the word word that needs to be filled.
+    - text: OK! Give me the sentence with an underscore as missing word.
+    - text: OKAY! Give me the sentence with an underscore in it.
+  # utter_ask_answer_a:
+  #   - text: Now please give me the answer A.
+  # utter_ask_answer_b:
+  #   - text: Now please, the answer B.
+  # utter_ask_answer_c:
+  #   - text: Next please the answer C.
+  # utter_ask_answer_d:
+  #   - text: And finally the answer D.
   utter_ask_choices:
     - text: Now please give me at least 2 possible choices. You can put your answers between commas or use this formula (A)answer A(B)answer B...
-  utter_ask_sentence_and_choices:
-    - text: Please give me the incomplete sentence and at least 2 possible choices.
-  utter_comfirm_sentence_choices_values:
-    - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
+  # utter_ask_sentence_and_choices:
+  #   - text: Please give me the incomplete sentence and at least 2 possible choices.
+  # utter_comfirm_sentence_choices_values:
+  #   - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
   utter_ask_phrase_to_tracau:
     - text: Sure! Which phrase do you want to ask?
     - text: Sure thing! The word do you like to inquire about?
@@ -139,19 +146,19 @@ responses:
     - text: Sure! Please send me the text you want me to analyze.
     - text: Without a doubt! Give me the text you want me to look over.
 forms:
-  english_multiple_choice_sentence_completion_form:
-    required_slots:
-      answer_a:
-        - type: from_text
-      answer_b:
-        - type: from_text
-      answer_c:
-        - type: from_text
-      answer_d:
-        - type: from_text
-      sentence:
-        - type: from_text
-  english_multiple_choice_sentence_completion_with_list_of_choices_form:
+  # multi_choice_sentence_completion_form:
+  #   required_slots:
+  #     answer_a:
+  #       - type: from_text
+  #     answer_b:
+  #       - type: from_text
+  #     answer_c:
+  #       - type: from_text
+  #     answer_d:
+  #       - type: from_text
+  #     sentence:
+  #       - type: from_text
+  multi_choice_sentence_completion_with_list_of_choices_form:
     required_slots:
       sentence:
         - type: from_text
@@ -172,21 +179,21 @@ forms:
 
 slots:
   phrase_to_tracau:
-    auto_fill: false
+    auto_fill: true
     influence_conversation: true
     type: text
   text_for_correction:
-    auto_fill: false
+    auto_fill: true
     influence_conversation: true
     type: text
   sentence:
-    auto_fill: false
+    auto_fill: true
     influence_conversation: true
     type: text
   choices:
-    auto_fill: false
+    auto_fill: true
     influence_conversation: true
-    type: text
+    type: list
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

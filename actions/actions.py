@@ -17,8 +17,7 @@ from transformers import (
     BlenderbotSmallTokenizer,
     BlenderbotSmallForConditionalGeneration,
     ElectraForMaskedLM,
-    ElectraTokenizer,
-    pipeline
+    ElectraTokenizer
 )
 import re
 import requests as rq
@@ -33,6 +32,9 @@ global language_tool
 global gg
 language_tool = language_tool_python.LanguageTool('en-US')
 gg = GingerIt()
+ELECTRA_PATH = './electra-small-generator'
+ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
+ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
 
 
 def cut_paragraph(text, maximum_len=300):
@@ -171,6 +173,38 @@ class ActionOnFallBack(Action):
         return [AllSlotsReset()]
 
 
+# class ActionSolveMultipleChoiceSentenceCompletion(Action):
+
+#     def name(self) -> Text:
+#         return "action_solve_multiple_choice_sentence_completion"
+
+#     def run(self, dispatcher: CollectingDispatcher,
+#             tracker: Tracker,
+#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+#         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
+#         entities = tracker.latest_message['entities']
+#         sentence = next(
+#             (item['value'] for item in entities if item['entity'] == 'sentence'), '').strip()
+#         if sentence == '':
+#             dispatcher.utter_message(
+#                 "Please enter with the right syntax, for example: Solve this TOEIC reading question: <sentence>(A)answer A(B)answer B(C)answer C(D)answer D")
+#             return [AllSlotsReset()]
+#         sentence = re.sub(r'[-_]+', '***mask***', sentence)
+#         choices = [
+#             next((item['value']
+#                  for item in entities if item['entity'] == 'answer_a'), '').strip(),
+#             next((item['value']
+#                  for item in entities if item['entity'] == 'answer_b'), '').strip(),
+#             next((item['value']
+#                  for item in entities if item['entity'] == 'answer_c'), '').strip(),
+#             next((item['value']
+#                  for item in entities if item['entity'] == 'answer_d'), '').strip()
+#         ]
+#         bot_answer_choice = fb.rank(sentence, options=choices)[0]
+#         dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
+
+#         return [AllSlotsReset()]
+
 class ActionSolveMultipleChoiceSentenceCompletion(Action):
 
     def name(self) -> Text:
@@ -179,33 +213,33 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        ELECTRA_PATH = './electra-small-generator'
-        ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
-        ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        entities = tracker.latest_message['entities']
-        sentence = next(
-            (item['value'] for item in entities if item['entity'] == 'sentence'), '').strip()
-        if sentence == '':
+        sentence = tracker.get_slot("sentence")
+        if len(str(sentence)) < 10:
             dispatcher.utter_message(
                 "Please enter with the right syntax, for example: Solve this TOEIC reading question: <sentence>(A)answer A(B)answer B(C)answer C(D)answer D")
             return [AllSlotsReset()]
-        sentence = re.sub(r'_+', '***mask***', sentence)
-        choices = [
-            next((item['value']
-                 for item in entities if item['entity'] == 'answer_a'), '').strip(),
-            next((item['value']
-                 for item in entities if item['entity'] == 'answer_b'), '').strip(),
-            next((item['value']
-                 for item in entities if item['entity'] == 'answer_c'), '').strip(),
-            next((item['value']
-                 for item in entities if item['entity'] == 'answer_d'), '').strip()
-        ]
+        sentence = re.sub(r'[-_]+', '***mask***', sentence)
+        choices = tracker.get_slot("choices")
+        if isinstance(choices, str):
+            if choices.count(',') >= 3:
+                choices = choices.rsplit(',')
+            else:
+                choices = re.split(
+                    r'\s*?\([A-D]\)|[A-D]\.|[A-D]\s+?\.*', choices)
+                choices.pop(0)
+        elif isinstance(choices, list) and len(choices) == 1:
+            if choices[0].count(',') >= 3:
+                choices = choices[0].rsplit(',')
+            else:
+                choices = re.split(
+                    r'\s*?\([A-D]\)|[A-D]\.|[A-D]\s+?\.*', choices[0])
+                choices.pop(0)
+        choices = [s.strip() for s in choices]
         bot_answer_choice = fb.rank(sentence, options=choices)[0]
         dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
 
         return [AllSlotsReset()]
-
 
 class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
 
@@ -215,9 +249,6 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        ELECTRA_PATH = './electra-small-generator'
-        ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
-        ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
 
         sentence = tracker.get_slot("sentence")
@@ -232,7 +263,7 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
             choices = [s.strip() for s in choices]
         else:
             choices = re.split(
-                r'\s*?\([A-Da-d]\)|[A-Da-d]\.|[A-Da-d]\s+?\.*', choices)
+                r'\s*?\([A-D]\)|[A-D]\.|[A-D]\s+?\.*', choices)
             choices.pop(0)
             choices = [s.strip() for s in choices]
 
@@ -255,9 +286,6 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndchoices(Ac
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        ELECTRA_PATH = './electra-small-generator'
-        ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
-        ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
 
         sentence_and_choices = tracker.get_slot("sentence_and_choices")
