@@ -46,7 +46,7 @@ pipeline:
     epochs: 100
 
   - name: FallbackClassifier
-    threshold: 0.5
+    threshold: 0.49
     # ambiguity_threshold: 0.1
 
 # Configuration for Rasa Core.

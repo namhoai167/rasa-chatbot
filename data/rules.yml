@@ -26,7 +26,6 @@ rules:
       - slot_was_set:
           - requested_slot: null
       - action: action_solve_multiple_choice_sentence_completion
-      - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
 
   #- rule: Submit and solve English multiple choice sentence completion form with list of question and choices
   #  condition:

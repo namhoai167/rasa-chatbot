@@ -24,24 +24,16 @@ intents:
       use_entities:
         - incomplete_sentence
         - choices
-        # - answer_a
-        # - answer_b
-        # - answer_c
-        # - answer_d
 
 # BLENDERBOT
-  - nlu_fallback:
-      use_entities: []
+  # - nlu_fallback:
+  #     use_entities: []
 
 # TRACAU
   - request_to_tracau:
       ignore_entities:
         - incomplete_sentence
         - choices
-        # - answer_a
-        # - answer_b
-        # - answer_c
-        # - answer_d
         - text_for_correction
       use_entities:
         - phrase_to_tracau
@@ -56,10 +48,6 @@ intents:
         - phrase_to_tracau
         - incomplete_sentence
         - choices
-        # - answer_a
-        # - answer_b
-        # - answer_c
-        # - answer_d
       use_entities:
         - text_for_correction
 
@@ -68,10 +56,6 @@ entities:
   - text_for_correction
   - incomplete_sentence
   - choices
-  # - answer_a
-  # - answer_b
-  # - answer_c
-  # - answer_d
 
 actions:
   - action_fallback_chat
@@ -120,14 +104,6 @@ responses:
     - text: Please provide me the incomplete sentence. Remember to use underscores to indicate the word word that needs to be filled.
     - text: OK! Give me the sentence with an underscore as missing word.
     - text: OKAY! Give me the sentence with an underscore in it.
-  # utter_ask_answer_a:
-  #   - text: Now please give me the answer A.
-  # utter_ask_answer_b:
-  #   - text: Now please, the answer B.
-  # utter_ask_answer_c:
-  #   - text: Next please the answer C.
-  # utter_ask_answer_d:
-  #   - text: And finally the answer D.
   utter_ask_choices:
     - text: Now please give me at least 2 possible choices. You can put your answers between commas or use this formula (A)answer A(B)answer B...
   utter_bot_choice:
@@ -136,8 +112,8 @@ responses:
     - text: I will choose {bot_choice}
     - text: Hmm, the blank could be {bot_choice}
   utter_ask_incomplete_sentence_type_correctly:
-    - text: Your sentence "{incomplete_sentence}" \n That's seem very short or invalid. I'm assuming you mis-typed
-    - text: Your incomplete sentence '{incomplete_sentence}' \n That might invalid, do you want to continue?
+    - text: Your sentence "{sentence}" \n That's seem very short or invalid. I'm assuming you mis-typed
+    - text: Your incomplete sentence '{sentence}' \n That might invalid, do you want to continue?
       buttons:
       - title: "yes"
         payload: "/affirm"
@@ -146,8 +122,8 @@ responses:
       - title: "cancel"
         payload: "/cancel"
   utter_ask_choices_type_correctly:
-    - text: Your choices are '{choices}' \n There is one choice from your input, we might give you the same answer
-    - text: Your choices are "{choices}" \n Your choices seem invalid, do you want to continue?
+    - text: Your choices are '{choicez}' \n There is one choice from your input, we might give you the same answer
+    - text: Your choices are "{choicez}" \n Your choices seem invalid, do you want to continue?
       buttons:
       - title: "yes"
         payload: "/affirm"
@@ -155,10 +131,6 @@ responses:
         payload: "/deny"
       - title: "cancel"
         payload: "/cancel"
-    # utter_ask_sentence_and_choices:
-  #   - text: Please give me the incomplete sentence and at least 2 possible choices.
-  # utter_comfirm_sentence_choices_values:
-  #   - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
   utter_ask_phrase_to_tracau:
     - text: Sure! Which phrase do you want to ask?
     - text: Sure thing! The word do you like to inquire about?
@@ -172,18 +144,6 @@ responses:
     - text: Sure! Please send me the text you want me to analyze.
     - text: Without a doubt! Give me the text you want me to look over.
 forms:
-  # multi_choice_sentence_completion_form:
-  #   required_slots:
-  #     answer_a:
-  #       - type: from_text
-  #     answer_b:
-  #       - type: from_text
-  #     answer_c:
-  #       - type: from_text
-  #     answer_d:
-  #       - type: from_text
-  #     sentence:
-  #       - type: from_text
   multi_choice_sentence_completion_with_list_of_choices_form:
     required_slots:
       incomplete_sentence:

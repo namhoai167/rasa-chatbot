@@ -256,6 +256,39 @@ class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationA
             return ActionExecutionRejection()
         return {"incomplete_sentence": None, "incomplete_sentence_type_correctly": None}
 
+    def validate_incomplete_sentence(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> Dict[Text, Any]:
+        print(slot_value)
+        if len(slot_value) < 20 or not re.search(r'[_]+|[-]{2,}', slot_value):
+            dispatcher.utter_message(template="utter_ask_incomplete_sentence_type_correctly", sentence=slot_value)
+            return {"incomplete_sentence": None}
+        else:
+            return {"incomplete_sentence": slot_value}
+
+    def validate_choices(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> Dict[Text, Any]:
+        print(slot_value)
+        if isinstance(slot_value, str):
+            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', slot_value)
+        elif isinstance(slot_value, list) and len(slot_value) == 1:
+            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', slot_value[0])
+        choices = [x for x in choices if x.strip()]
+        if len(choices) < 2:
+            dispatcher.utter_message(template="utter_ask_choices_type_correctly", choicez=choices)
+            return {"choices": None}
+        else:
+            return {"choices": slot_value}
+                     
 
 class ActionSolveMultipleChoiceSentenceCompletion(Action):
 
@@ -266,7 +299,7 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        sentence = tracker.get_slot("incomplete_sentence")
+        sentence = str(tracker.get_slot("incomplete_sentence"))
         sentence = re.sub(r'[_]+|[-]{2,}', '***mask***', sentence)
 
         choices = tracker.get_slot("choices")
@@ -293,21 +326,18 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
 
-        sentence = tracker.get_slot("incomplete_sentence")
+        sentence = str(tracker.get_slot("incomplete_sentence"))
         choices = tracker.get_slot("choices")
 
         # Use regex to replace mask for fitbert sentence
         sentence = re.sub(r'[_]+|[-]{2,}', '***mask***', sentence)
 
         # Reformat choices list for fitbert
-        if choices.count(',') >= 3:
-            choices = choices.rsplit(',')
-            choices = [s.strip() for s in choices]
-        else:
-            choices = re.split(
-                r'\s*?\([A-D]\)|[A-D]\.|[A-D]\s+?\.*', choices)
-            choices.pop(0)
-            choices = [s.strip() for s in choices]
+        if isinstance(choices, str):
+            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices)
+        elif isinstance(choices, list) and len(choices) == 1:
+            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices[0])
+        choices = [x for x in choices if x.strip()]
 
         bot_answer_choice = fb.rank(sentence, options=choices)[0]
         dispatcher.utter_message(
