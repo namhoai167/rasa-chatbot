@@ -28,16 +28,20 @@ nlu:
   #     - could you choose the word to complete this sentence [_ she joined our company three years ago, Mrs. Mashimo has greatly expanded our customer base.](sentence_and_choices)(A)[When](sentence_and_choices) (B)[Before](sentence_and_choices) (C)[Whereas](sentence_and_choices) (D)[Since](sentence_and_choices)
   #     - could you choose the phrase that best completes the sentence from four choices [The company _ working on the project for the main office even before it chose the land to build on.](sentence_and_choices)[will begin](sentence_and_choices), [had begun](sentence_and_choices), [has begun](sentence_and_choices), [is beginning](sentence_and_choices)
 
-  - regex: sentence
+  - regex: incomplete_sentence
     examples: |
-      - (?<=").*[-_]+.*?(?="\(A\))
-      - (?<=:).*[-_]+.*?(?=\(A\))
+      - (?<=").*([_]+|[-]{2,}).*?(?="\(A\))
+      - (?<=:).*([_]+|[-]{2,}).*?(?=\(A\))
   - regex: choices
     examples: |
       - (?<=\(A\)).*?(?=\(B\))
       - (?<=\(B\)).*?(?=\(C\))
       - (?<=\(C\)).*?(?=\(D\))
       - (?<=\(D\)).*
+      - (?<=\(a\)).*?(?=\(b\))
+      - (?<=\(b\)).*?(?=\(c\))
+      - (?<=\(c\)).*?(?=\(d\))
+      - (?<=\(d\)).*
   # - regex: answer_a
   #   examples: |
   #     - (?<=\(A\)).*?(?=\(B\))
@@ -57,16 +61,16 @@ nlu:
       - give me the answer for this question of TOEIC reading part 5
       - could you choose the word to complete this sentence
       - could you choose the phrase that best completes the sentence from four choices
-      - can you help me with this multiple choice sentence completion: [Mr. Holt's acceptance of the financial executive position is -------his satisfaction with the salary offer.](sentence)(A)[ in contrast to](choices)(B)[dependent on](choices)(C)[ as opposed to](choices)(D)[ on condition that](choices)
-      - please solve this sentence: [The assets of Marble Faun Publishing Company------- last quarter when one of their main local distributors went out of business.](sentence)(A)[suffer](choices)(B)[suffers](choices)(C)[suffering](choices)(D)[suffered](choices)
-      - give me the answer for this question of TOEIC reading part 5: [lndie film director Luke Steele will be in London for the premiere of _ new movie.](sentence)(A)[him](choices)(B)[his](choices)(C)[himself](choices)(D)[he](choices)
-      - could you choose the word to complete this sentence: [Laboratory employees are expected to wear a name tag and carry identification at- times.](sentence)(A)[full](choices)(B)[complete](choices)(C)[all](choices)(D)[total](choices)
-      - could you choose the phrase that best completes the sentence from four choices:[ The latest training_ contains tips on teaching a second language to international students.](sentence)(A)[method](choices)(B)[guide](choices)(C)[staff](choices)(D)[role](choices)
-      - "[Ursa Major Corp. has _negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](sentence)"(A)[soon](choices)(B)[shortly](choices)(C)[recently](choices)(D)[yet](choices)
-      - "[Ms. Cho relayed her concerns about the company's financial situation while she __ a meeting with the manager.](sentence)"(A)[having](choices)(B)[will have](choices)(C)[was having](choices)(D)[has](choices)
-      - "[Whether it is _ to register for a student discount card depends on the needs of the individual.](sentence)"(A)[necessary](choices)(B)[necessarily](choices)(C)[necessitate](choices)(D)[necessity](choices)
-      - "[Even experienced clerks are encouraged to attend training -------to keep them updated on new ideas in the world of banking.](sentence)"(A)[materials](choices)(B)[sessions](choices)(C)[experiences](choices)(D)[positions](choices)
-      - "[Workers are advised not to operate certain machines by -------.](sentence)"(A)[they](choices)(B)[them](choices)(C)[their](choices)(D)[themselves](choices)
+      - can you help me with this multiple choice sentence completion: [Mr. Holt's acceptance of the financial executive position is -------his satisfaction with the salary offer.](incomplete_sentence)(A)[ in contrast to](choices)(B)[dependent on](choices)(C)[ as opposed to](choices)(D)[ on condition that](choices)
+      - please solve this sentence: [The assets of Marble Faun Publishing Company------- last quarter when one of their main local distributors went out of business.](incomplete_sentence)(A)[suffer](choices)(B)[suffers](choices)(C)[suffering](choices)(D)[suffered](choices)
+      - give me the answer for this question of TOEIC reading part 5: [lndie film director Luke Steele will be in London for the premiere of _ new movie.](incomplete_sentence)(a)[him](choices)(b)[his](choices)(c)[himself](choices)(d)[he](choices)
+      - could you choose the word to complete this sentence: [Laboratory employees are expected to wear a name tag and carry identification at- times.](incomplete_sentence)(a)[full](choices)(b)[complete](choices)(c)[all](choices)(d)[total](choices)
+      - could you choose the phrase that best completes the sentence from four choices:[ The latest training_ contains tips on teaching a second language to international students.](incomplete_sentence)(A)[method](choices)(B)[guide](choices)(C)[staff](choices)(D)[role](choices)
+      - "[Ursa Major Corp. has _negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](incomplete_sentence)"(A)[soon](choices)(B)[shortly](choices)(C)[recently](choices)(D)[yet](choices)
+      - "[Ms. Cho relayed her concerns about the company's financial situation while she __ a meeting with the manager.](incomplete_sentence)"(A)[having](choices)(B)[will have](choices)(C)[was having](choices)(D)[has](choices)
+      - "[Whether it is _ to register for a student discount card depends on the needs of the individual.](incomplete_sentence)"(a)[necessary](choices)(b)[necessarily](choices)(c)[necessitate](choices)(d)[necessity](choices)
+      - "[Even experienced clerks are encouraged to attend training -------to keep them updated on new ideas in the world of banking.](incomplete_sentence)"(a)[materials](choices)(b)[sessions](choices)(c)[experiences](choices)(d)[positions](choices)
+      - "[Workers are advised not to operate certain machines by -------.](incomplete_sentence)"(A)[they](choices)(B)[them](choices)(C)[their](choices)(D)[themselves](choices)
   # - intent: multiple_choice_sentence_completion
   #   examples: |
   #     - can you help me with this multiple choice sentence completion: [Mr. Holt's acceptance of the financial executive position is -------his satisfaction with the salary offer.](sentence)(A)[ in contrast to](answer_a)(B)[dependent on](answer_b)(C)[ as opposed to](answer_c)(D)[ on condition that](answer_d)
@@ -342,34 +346,40 @@ nlu:
       - thanks for your information
       - thanks f
 
-#  - intent: affirm
-#    examples: |
-#      - yes
-#      - yep
-#      - yeah
-#      - y
-#      - ok
-#      - indeed
-#      - of course
-#      - that's right
-#      - that sounds good
-#      - correct
-#      - great
-#      - perfect
+  - intent: affirm
+    examples: |
+      - yes
+      - yep
+      - yeah
+      - y
+      - ok
+      - indeed
+      - of course
+      - that's right
+      - that sounds good
+      - correct
+      - great
+      - perfect
 
-#  - intent: deny
-#    examples: |
-#      - no
-#      - nope
-#      - n
-#      - nah
-#      - never
-#      - I don't think so
-#      - don't like that
-#      - no way
-#      - not really
-#      - not true
-#      - no thanks
+  - intent: deny
+    examples: |
+      - no
+      - nope
+      - n
+      - nah
+      - never
+      - I don't think so
+      - don't like that
+      - no way
+      - not really
+      - not true
+      - no thanks
+
+  - intent: cancel
+    examples: |
+      - cancel
+      - quit
+      - stop
 
   - intent: bot_challenge
     examples : |

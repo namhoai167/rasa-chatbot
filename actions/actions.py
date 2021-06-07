@@ -4,13 +4,12 @@
 # See this guide on how to implement these action:
 # https://rasa.com/docs/rasa/custom-actions
 
-from gingerit.gingerit import GingerIt
-import language_tool_python
-from typing import Any, Text, Dict, List
-from rasa_sdk import Action, Tracker
+from typing import Any, Text, Dict, List, Optional
+from rasa_sdk import Action, Tracker, FormValidationAction
+from rasa_sdk.types import DomainDict
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import SlotSet
-from rasa_sdk.events import AllSlotsReset
+from rasa_sdk.events import SlotSet, AllSlotsReset
+from rasa_sdk.interfaces import ActionExecutionRejection
 
 from fitbert import FitBert
 from transformers import (
@@ -19,6 +18,8 @@ from transformers import (
     ElectraForMaskedLM,
     ElectraTokenizer
 )
+from gingerit.gingerit import GingerIt
+import language_tool_python
 import re
 import requests as rq
 import numpy as np
@@ -28,14 +29,11 @@ from nltk.stem import WordNetLemmatizer
 from nltk import tokenize
 nltk.download('wordnet')
 nltk.download('punkt')
-global language_tool
-global gg
+
 language_tool = language_tool_python.LanguageTool('en-US')
 gg = GingerIt()
-ELECTRA_PATH = './electra-small-generator'
-ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
-ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
-
+ELECTRAmodel = ElectraForMaskedLM.from_pretrained('./electra-small-generator')
+ELECTRAtokenizer = ElectraTokenizer.from_pretrained('./electra-small-generator')
 
 def cut_paragraph(text, maximum_len=300):
     sentences = tokenize.sent_tokenize(text)
@@ -173,37 +171,91 @@ class ActionOnFallBack(Action):
         return [AllSlotsReset()]
 
 
-# class ActionSolveMultipleChoiceSentenceCompletion(Action):
+# https://rasa.com/docs/rasa/forms#dynamic-form-behavior
+# https://github.com/RasaHQ/rasa-form-examples/blob/main/06-custom-name-experience/actions/actions.py
+class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationAction):
+    def name(self) -> Text:
+        return "validate_multi_choice_sentence_completion_with_list_of_choices_form"
+    
+    async def required_slots(
+        self,
+        slots_mapped_in_domain: List[Text],
+        dispatcher: "CollectingDispatcher",
+        tracker: "Tracker",
+        domain: "DomainDict",
+    ) -> Optional[List[Text]]:
 
-#     def name(self) -> Text:
-#         return "action_solve_multiple_choice_sentence_completion"
+        # Trigger when sentence too short. If the incomple sentence too short, maybe it just a word
+        # Or there are no _ or -- to MASK in sentence
+        sentence = tracker.get_slot("incomplete_sentence")
+        if sentence is not None:
+            if len(sentence) < 20 or not re.search(r'[_]+|[-]{2,}', sentence):
+                dispatcher.utter_message(template="utter_ask_incomplete_sentence_type_correctly", incomplete_sentence=sentence)
+                return ["incomplete_sentence_type_correctly"] + slots_mapped_in_domain
 
-#     def run(self, dispatcher: CollectingDispatcher,
-#             tracker: Tracker,
-#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-#         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-#         entities = tracker.latest_message['entities']
-#         sentence = next(
-#             (item['value'] for item in entities if item['entity'] == 'sentence'), '').strip()
-#         if sentence == '':
-#             dispatcher.utter_message(
-#                 "Please enter with the right syntax, for example: Solve this TOEIC reading question: <sentence>(A)answer A(B)answer B(C)answer C(D)answer D")
-#             return [AllSlotsReset()]
-#         sentence = re.sub(r'[-_]+', '***mask***', sentence)
-#         choices = [
-#             next((item['value']
-#                  for item in entities if item['entity'] == 'answer_a'), '').strip(),
-#             next((item['value']
-#                  for item in entities if item['entity'] == 'answer_b'), '').strip(),
-#             next((item['value']
-#                  for item in entities if item['entity'] == 'answer_c'), '').strip(),
-#             next((item['value']
-#                  for item in entities if item['entity'] == 'answer_d'), '').strip()
-#         ]
-#         bot_answer_choice = fb.rank(sentence, options=choices)[0]
-#         dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
+        # Trigger when only one choices
+        choices = tracker.get_slot("choices")
+        if choices is not None:
+            if isinstance(choices, str):
+                choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices)
+            elif isinstance(choices, list) and len(choices) == 1:
+                choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices[0])
+            choices = [x for x in choices if x.strip()]
+            if len(choices) < 2:
+                dispatcher.utter_message(template="utter_ask_choices_type_correctly", choices=choices)
+                return ["choices_type_correctly"] + slots_mapped_in_domain
+        return slots_mapped_in_domain
+    
+    async def extract_incomplete_sentence_type_correctly(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> Dict[Text, Any]:
+        intent = tracker.get_intent_of_latest_message()
+        if intent not in ["affirm", "deny", "cancel"]:
+            return {"incomplete_sentence_type_correctly": None}
+        return {"incomplete_sentence_type_correctly": intent}
 
-#         return [AllSlotsReset()]
+    async def extract_choices_type_correctly(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> Dict[Text, Any]:
+        intent = tracker.get_intent_of_latest_message()
+        if intent not in ["affirm", "deny", "cancel"]:
+            return {"choices_type_correctly": None}
+        return {"choices_type_correctly": intent}
+
+    def validate_choices_type_correctly(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> Dict[Text, Any]:
+        """Validate `choices_type_correctly` value."""
+        user_intent = tracker.get_slot("choices_type_correctly")
+        if user_intent == "affirm":
+            return {"choices": tracker.get_slot("choices"), "choices_type_correctly": "affirm"}
+        elif user_intent == "deny":
+            return {"choices": tracker.get_slot("choices"), "choices_type_correctly": "deny"}
+        elif user_intent == "cancel":
+            return ActionExecutionRejection()
+        return {"choices": None, "choices_type_correctly": None}
+
+    def validate_incomplete_sentence_type_correctly(
+        self,
+        slot_value: Any,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> Dict[Text, Any]:
+        """Validate `incomplete_sentence_type_correctly` value."""
+        user_intent = tracker.get_slot("incomplete_sentence_type_correctly")
+        if user_intent == "affirm":
+            return {"incomplete_sentence": tracker.get_slot("incomplete_sentence"), "incomplete_sentence_type_correctly": "affirm"}
+        elif user_intent == "deny":
+            return {"incomplete_sentence": tracker.get_slot("incomplete_sentence"), "incomplete_sentence_type_correctly": "deny"}
+        elif user_intent == "cancel":
+            return ActionExecutionRejection()
+        return {"incomplete_sentence": None, "incomplete_sentence_type_correctly": None}
+
 
 class ActionSolveMultipleChoiceSentenceCompletion(Action):
 
@@ -214,30 +266,20 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-        sentence = tracker.get_slot("sentence")
-        if len(str(sentence)) < 10:
-            dispatcher.utter_message(
-                "Please enter with the right syntax, for example: Solve this TOEIC reading question: <sentence>(A)answer A(B)answer B(C)answer C(D)answer D")
-            return [AllSlotsReset()]
-        sentence = re.sub(r'[-_]+', '***mask***', sentence)
+        sentence = tracker.get_slot("incomplete_sentence")
+        sentence = re.sub(r'[_]+|[-]{2,}', '***mask***', sentence)
+
         choices = tracker.get_slot("choices")
         if isinstance(choices, str):
-            if choices.count(',') >= 3:
-                choices = choices.rsplit(',')
-            else:
-                choices = re.split(
-                    r'\s*?\([A-D]\)|[A-D]\.|[A-D]\s+?\.*', choices)
-                choices.pop(0)
+            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices)
         elif isinstance(choices, list) and len(choices) == 1:
-            if choices[0].count(',') >= 3:
-                choices = choices[0].rsplit(',')
-            else:
-                choices = re.split(
-                    r'\s*?\([A-D]\)|[A-D]\.|[A-D]\s+?\.*', choices[0])
-                choices.pop(0)
-        choices = [s.strip() for s in choices]
+            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices[0])
+        choices = [x for x in choices if x.strip()]
         bot_answer_choice = fb.rank(sentence, options=choices)[0]
-        dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
+        dispatcher.utter_message(
+            template="utter_bot_choice", 
+            bot_choice=bot_answer_choice
+        )
 
         return [AllSlotsReset()]
 
@@ -251,11 +293,11 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
 
-        sentence = tracker.get_slot("sentence")
+        sentence = tracker.get_slot("incomplete_sentence")
         choices = tracker.get_slot("choices")
 
         # Use regex to replace mask for fitbert sentence
-        sentence = re.sub(r'[-_]+', '***mask***', sentence)
+        sentence = re.sub(r'[_]+|[-]{2,}', '***mask***', sentence)
 
         # Reformat choices list for fitbert
         if choices.count(',') >= 3:
@@ -268,7 +310,10 @@ class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
             choices = [s.strip() for s in choices]
 
         bot_answer_choice = fb.rank(sentence, options=choices)[0]
-        dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
+        dispatcher.utter_message(
+            template="utter_bot_choice", 
+            bot_choice=bot_answer_choice
+        )
 
         return [
             SlotSet("sentence", None),

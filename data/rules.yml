@@ -4,7 +4,7 @@ rules:
   ######################
   # TOEIC READING PART 5
   ######################
-  - rule: Retrieve information about sentence and answers then feed into ELECTRA for prediction
+  - rule: Activate form when user want fill incomple sentence with multi choice
     steps:
       - intent: multiple_choice_sentence_completion
       # - action: action_solve_multiple_choice_sentence_completion
@@ -26,7 +26,7 @@ rules:
       - slot_was_set:
           - requested_slot: null
       - action: action_solve_multiple_choice_sentence_completion
-      # - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
+      - action: action_solve_multiple_choice_sentence_completion_with_list_of_choices
 
   #- rule: Submit and solve English multiple choice sentence completion form with list of question and choices
   #  condition:

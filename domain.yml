@@ -4,8 +4,9 @@ intents:
   - greet
   - goodbye
   - thank
-#  - affirm
-#  - deny
+  - affirm
+  - deny
+  - cancel
   - bot_challenge
   - help
 
@@ -21,7 +22,7 @@ intents:
         - phrase_to_tracau
         - text_for_correction
       use_entities:
-        - sentence
+        - incomplete_sentence
         - choices
         # - answer_a
         # - answer_b
@@ -35,7 +36,7 @@ intents:
 # TRACAU
   - request_to_tracau:
       ignore_entities:
-        - sentence
+        - incomplete_sentence
         - choices
         # - answer_a
         # - answer_b
@@ -53,7 +54,7 @@ intents:
   - writing_check:
       ignore_entities:
         - phrase_to_tracau
-        - sentence
+        - incomplete_sentence
         - choices
         # - answer_a
         # - answer_b
@@ -65,7 +66,7 @@ intents:
 entities:
   - phrase_to_tracau
   - text_for_correction
-  - sentence
+  - incomplete_sentence
   - choices
   # - answer_a
   # - answer_b
@@ -114,7 +115,7 @@ responses:
     - text: I am a bot, built with ML and Deep learning. I'm here to assist you in your efforts to improve your English.
     - text: I am a bot that was created using ML and Deep Learning. I'm here to help you with your English-improvement endeavors.
     - text: I am a Rasa framework-based bot. I'm here to assist you on your English-improvement quest.
-  utter_ask_sentence:
+  utter_ask_incomplete_sentence:
     - text: Please give me the incomplete sentence. Remember to mark the word position needed to be filled with underscores
     - text: Please provide me the incomplete sentence. Remember to use underscores to indicate the word word that needs to be filled.
     - text: OK! Give me the sentence with an underscore as missing word.
@@ -129,7 +130,32 @@ responses:
   #   - text: And finally the answer D.
   utter_ask_choices:
     - text: Now please give me at least 2 possible choices. You can put your answers between commas or use this formula (A)answer A(B)answer B...
-  # utter_ask_sentence_and_choices:
+  utter_bot_choice:
+    - text: My guess is {bot_choice}
+    - text: My final answer is {bot_choice}
+    - text: I will choose {bot_choice}
+    - text: Hmm, the blank could be {bot_choice}
+  utter_ask_incomplete_sentence_type_correctly:
+    - text: Your sentence "{incomplete_sentence}" \n That's seem very short or invalid. I'm assuming you mis-typed
+    - text: Your incomplete sentence '{incomplete_sentence}' \n That might invalid, do you want to continue?
+      buttons:
+      - title: "yes"
+        payload: "/affirm"
+      - title: "no, retype"
+        payload: "/deny"
+      - title: "cancel"
+        payload: "/cancel"
+  utter_ask_choices_type_correctly:
+    - text: Your choices are '{choices}' \n There is one choice from your input, we might give you the same answer
+    - text: Your choices are "{choices}" \n Your choices seem invalid, do you want to continue?
+      buttons:
+      - title: "yes"
+        payload: "/affirm"
+      - title: "no, retype"
+        payload: "/deny"
+      - title: "cancel"
+        payload: "/cancel"
+    # utter_ask_sentence_and_choices:
   #   - text: Please give me the incomplete sentence and at least 2 possible choices.
   # utter_comfirm_sentence_choices_values:
   #   - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
@@ -160,7 +186,7 @@ forms:
   #       - type: from_text
   multi_choice_sentence_completion_with_list_of_choices_form:
     required_slots:
-      sentence:
+      incomplete_sentence:
         - type: from_text
       choices:
         - type: from_text
@@ -179,21 +205,18 @@ forms:
 
 slots:
   phrase_to_tracau:
-    auto_fill: true
-    influence_conversation: true
     type: text
   text_for_correction:
-    auto_fill: true
-    influence_conversation: true
-    type: text
-  sentence:
-    auto_fill: true
-    influence_conversation: true
+    type: text 
+  incomplete_sentence:
     type: text
   choices:
-    auto_fill: true
-    influence_conversation: true
     type: list
+  incomplete_sentence_type_correctly:
+    type: text
+  choices_type_correctly:
+    type: text
+
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
