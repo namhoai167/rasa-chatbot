@@ -173,9 +173,9 @@ class ActionOnFallBack(Action):
 
 # https://rasa.com/docs/rasa/forms#dynamic-form-behavior
 # https://github.com/RasaHQ/rasa-form-examples/blob/main/06-custom-name-experience/actions/actions.py
-class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationAction):
+class ValidateTOEICpart5Form(FormValidationAction):
     def name(self) -> Text:
-        return "validate_multi_choice_sentence_completion_with_list_of_choices_form"
+        return "validate_TOEIC_part5_form"
     
     async def required_slots(
         self,
@@ -190,7 +190,7 @@ class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationA
         sentence = tracker.get_slot("incomplete_sentence")
         if sentence is not None:
             if len(sentence) < 20 or not re.search(r'[_]+|[-]{2,}', sentence):
-                dispatcher.utter_message(template="utter_ask_incomplete_sentence_type_correctly", incomplete_sentence=sentence)
+                dispatcher.utter_message(template="utter_ask_incomplete_sentence_type_correctly", sentence=sentence)
                 return ["incomplete_sentence_type_correctly"] + slots_mapped_in_domain
 
         # Trigger when only one choices
@@ -202,7 +202,7 @@ class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationA
                 choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices[0])
             choices = [x for x in choices if x.strip()]
             if len(choices) < 2:
-                dispatcher.utter_message(template="utter_ask_choices_type_correctly", choices=choices)
+                dispatcher.utter_message(template="utter_ask_choices_type_correctly", choicez=choices)
                 return ["choices_type_correctly"] + slots_mapped_in_domain
         return slots_mapped_in_domain
     
@@ -234,7 +234,7 @@ class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationA
         if user_intent == "affirm":
             return {"choices": tracker.get_slot("choices"), "choices_type_correctly": "affirm"}
         elif user_intent == "deny":
-            return {"choices": tracker.get_slot("choices"), "choices_type_correctly": "deny"}
+            return {"choices": None, "choices_type_correctly": "deny"}
         elif user_intent == "cancel":
             return ActionExecutionRejection()
         return {"choices": None, "choices_type_correctly": None}
@@ -251,7 +251,7 @@ class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationA
         if user_intent == "affirm":
             return {"incomplete_sentence": tracker.get_slot("incomplete_sentence"), "incomplete_sentence_type_correctly": "affirm"}
         elif user_intent == "deny":
-            return {"incomplete_sentence": tracker.get_slot("incomplete_sentence"), "incomplete_sentence_type_correctly": "deny"}
+            return {"incomplete_sentence": None, "incomplete_sentence_type_correctly": "deny"}
         elif user_intent == "cancel":
             return ActionExecutionRejection()
         return {"incomplete_sentence": None, "incomplete_sentence_type_correctly": None}
@@ -293,7 +293,7 @@ class ValidateMultiChoiceSentenceSompletionWithListOfChoicesForm(FormValidationA
 class ActionSolveMultipleChoiceSentenceCompletion(Action):
 
     def name(self) -> Text:
-        return "action_solve_multiple_choice_sentence_completion"
+        return "action_solve_TOEIC_part5"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
@@ -315,83 +315,6 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         )
 
         return [AllSlotsReset()]
-
-class ActionSolveMultipleChoiceSentenceCompletionWithListOfChoices(Action):
-
-    def name(self) -> Text:
-        return "action_solve_multiple_choice_sentence_completion_with_list_of_choices"
-
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-
-        sentence = str(tracker.get_slot("incomplete_sentence"))
-        choices = tracker.get_slot("choices")
-
-        # Use regex to replace mask for fitbert sentence
-        sentence = re.sub(r'[_]+|[-]{2,}', '***mask***', sentence)
-
-        # Reformat choices list for fitbert
-        if isinstance(choices, str):
-            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices)
-        elif isinstance(choices, list) and len(choices) == 1:
-            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices[0])
-        choices = [x for x in choices if x.strip()]
-
-        bot_answer_choice = fb.rank(sentence, options=choices)[0]
-        dispatcher.utter_message(
-            template="utter_bot_choice", 
-            bot_choice=bot_answer_choice
-        )
-
-        return [
-            SlotSet("sentence", None),
-            SlotSet("choices", None)
-        ]
-
-
-'''
-class ActionSolveMultipleChoiceSentenceCompletionWithListOfSentenceAndchoices(Action):
-
-    def name(self) -> Text:
-        return "action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices"
-
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-        fb = FitBert(model=ELECTRAmodel, tokenizer=ELECTRAtokenizer)
-
-        sentence_and_choices = tracker.get_slot("sentence_and_choices")
-
-        # Extract sentence from string with regex
-        sentence = re.match(
-            r'.*[-_]+.*?(|\.*?)((?=\s*\w+(,\s*\w+){1,3}$)|(?=\s*?[Aa]\.)|(?=\s*?\([Aa]\)))', sentence_and_choices).group().strip()
-
-        # Extract choices
-        choices = sentence_and_choices.replace(sentence, '').strip()
-
-        # Reformat sentence and choices for fitbert
-        # Use regex to replace mask
-        sentence = re.sub(r'[-_]+', '***mask***', sentence)
-
-        if choices.count(',') >= 3:
-            choices = choices.rsplit(',', 3)
-            choices = [s.strip() for s in choices]
-        else:
-            choices = re.split(
-                r'\([A-Da-d]\)|\.[A-Da-d]|[A-Da-d]\.|[A-Da-d]\s', choices)
-            choices.pop()
-            choices = [s.strip() for s in choices]
-
-        bot_answer_choice = fb.rank(sentence, options=choices)[0]
-        dispatcher.utter_message(text=f"My guess is: \"{bot_answer_choice}\"")
-
-        return [
-            SlotSet("sentence_and_choices", None)
-        ]
-'''
 
 
 class ActionRequestToTracau(Action):

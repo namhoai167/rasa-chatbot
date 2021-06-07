@@ -4,40 +4,22 @@ rules:
   ######################
   # TOEIC READING PART 5
   ######################
-  - rule: Activate form when user want fill incomple sentence with multi choice
+  - rule: Activate form when user want to ask TOEIC part5
     steps:
-      - intent: multiple_choice_sentence_completion
-      # - action: action_solve_multiple_choice_sentence_completion
-      - action: multi_choice_sentence_completion_with_list_of_choices_form
-      - active_loop: multi_choice_sentence_completion_with_list_of_choices_form
+      - intent: request solve TOEIC part5
+      - action: TOEIC_part5_form
+      - active_loop: TOEIC_part5_form
 
-  # - rule: Store slot for multiple choice sentence completion form with list of choices when user request
-  #   steps:
-  #     - intent: request_multiple_choice_sentence_completion
-  #     - action: multi_choice_sentence_completion_with_list_of_choices_form
-  #     - active_loop: multi_choice_sentence_completion_with_list_of_choices_form
-
-  - rule: Submit and solve multiple choice sentence completion form with list of choices
+  - rule: Submit and solve TOEIC part5 form with list of choices
     condition:
-      - active_loop: multi_choice_sentence_completion_with_list_of_choices_form
+      - active_loop: TOEIC_part5_form
     steps:
-      - action: multi_choice_sentence_completion_with_list_of_choices_form
+      - action: TOEIC_part5_form
       - active_loop: null
       - slot_was_set:
           - requested_slot: null
-      - action: action_solve_multiple_choice_sentence_completion
+      - action: action_solve_TOEIC_part5
 
-  #- rule: Submit and solve English multiple choice sentence completion form with list of question and choices
-  #  condition:
-  #    - active_loop: english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form
-  #  steps:
-  #    - action: english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form
-  #    - active_loop: null
-  #    - slot_was_set:
-  #        - requested_slot: null
-  #    - action: action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
-
-  
 
   ############
   # BLENDERBOT
@@ -109,3 +91,13 @@ rules:
     steps:
       - intent: help
       - action: utter_help
+
+  - rule: Greet back
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - rule: Reply thank
+    steps:
+      - intent: thank
+      - action: utter_thank

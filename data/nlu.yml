@@ -38,7 +38,7 @@ nlu:
       - (?<=\([Bb]\)).*?(?=\([Cc]\))
       - (?<=\([Cc]\)).*?(?=\([Dd]\))
       - (?<=\([Dd]\)).*
-  - intent: multiple_choice_sentence_completion
+  - intent: request solve TOEIC part5
     examples: |
       - can you help me with this multiple choice sentence completion
       - please solve this sentence that has one blank spot

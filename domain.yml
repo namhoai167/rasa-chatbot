@@ -17,7 +17,7 @@ intents:
 # - reply_with_multiple_choice
   # - request_multiple_choice_sentence_completion:
   #     use_entities: []
-  - multiple_choice_sentence_completion:
+  - request solve TOEIC part5:
       ignore_entities:
         - phrase_to_tracau
         - text_for_correction
@@ -59,9 +59,7 @@ entities:
 
 actions:
   - action_fallback_chat
-  - action_solve_multiple_choice_sentence_completion
-  - action_solve_multiple_choice_sentence_completion_with_list_of_choices
-#  - action_solve_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
+  - action_solve_TOEIC_part5
   - action_request_to_tracau
   - action_request_to_tracau_from_slot
   - action_writing_check
@@ -144,7 +142,7 @@ responses:
     - text: Sure! Please send me the text you want me to analyze.
     - text: Without a doubt! Give me the text you want me to look over.
 forms:
-  multi_choice_sentence_completion_with_list_of_choices_form:
+  TOEIC_part5_form:
     required_slots:
       incomplete_sentence:
         - type: from_text
