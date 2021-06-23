@@ -68,11 +68,11 @@ def split_into_sentences(text, string=True, joiner='\n'):
 
 def correct_gingerit(text, gg):
     splited_text = cut_paragraph(text)
-    return split_into_sentences(" ".join([gg.parse(t)['result'] for t in splited_text]))
+    return split_into_sentences(" ".join([gg.parse(t)['result'] for t in splited_text]), joiner=' ')
 
 
 def correct_language_tool(text, language_tool):
-    return(split_into_sentences(language_tool.correct(text)))
+    return(split_into_sentences(language_tool.correct(text), joiner=' '))
 
 
 def get(l, idx=0, ret_when_error=''):
