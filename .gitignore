@@ -7,6 +7,9 @@ test.ipynb
 en_core_web_md/
 en_core_web_md-3.0.0.dist-info/
 
+# Rasa
+credentials.yml
+
 # Rasa X files
 events.db
 events.db-shm
