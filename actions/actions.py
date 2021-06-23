@@ -233,8 +233,8 @@ class ActionOnFallBack(Action):
             BB_PATH)
         BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
         latest_user_message = tracker.latest_message['text']
-        correction = correct_language_tool(latest_user_message, language_tool)
-        correction = correct_gingerit(correction, gg)
+        correction = correct_gingerit(latest_user_message, gg)
+        correction = correct_language_tool(correction, language_tool)
         inputs = BBTokenizer([latest_user_message], return_tensors='pt')
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(
