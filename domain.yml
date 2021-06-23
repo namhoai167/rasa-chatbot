@@ -5,64 +5,68 @@ session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: false
 intents:
-- greet:
-    use_entities: true
-- goodbye:
-    use_entities: true
-- thank:
-    use_entities: true
-- bot_challenge:
-    use_entities: true
-- request_fill_blank:
-    use_entities: true
-- request_multiple_choice_sentence_completion:
-    use_entities: []
-- multiple_choice_sentence_completion:
-    ignore_entities:
-    - text_for_correction
-    - phrase_to_tracau
-- nlu_fallback:
-    use_entities: []
-- request_to_tracau:
-    use_entities:
-    - phrase_to_tracau
-- writing_check:
-    use_entities:
-    - text_for_correction
+  - greet
+  - goodbye
+  - thank
+  - affirm
+  - deny
+  - cancel
+  - bot_challenge
+  - help
+
+# FILL BLANK (Developing)
+  - request_fill_blank
+
+# TOEIC READING PART 5
+  - request solve TOEIC part5:
+      ignore_entities:
+        - phrase_to_tracau
+        - text_for_correction
+      use_entities:
+        - incomplete_sentence
+        - choices
+
+# BLENDERBOT
+  # - nlu_fallback:
+  #     use_entities: []
+
+# TRACAU
+  - request_to_tracau:
+      ignore_entities:
+        - incomplete_sentence
+        - choices
+        - text_for_correction
+      use_entities:
+        - phrase_to_tracau
+  - request_to_tracau_without_phrase:
+      use_entities: []
+
+# SPELLING AND GRAMMAR CORRECTION
+  - writing_check_without_text:
+      use_entities: []
+  - writing_check:
+      ignore_entities:
+        - phrase_to_tracau
+        - incomplete_sentence
+        - choices
+      use_entities:
+        - text_for_correction
+
 entities:
-- phrase_to_tracau
-- text_for_correction
-- sentence
-- answer_a
-- answer_b
-- answer_c
-- answer_d
-slots:
-  phrase_to_tracau:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
-    influence_conversation: true
-  text_for_correction:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: true
-    influence_conversation: true
-  sentence:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: false
-    influence_conversation: true
-  choices:
-    type: rasa.shared.core.slots.TextSlot
-    initial_value: null
-    auto_fill: false
-    influence_conversation: true
-  requested_slot:
-    type: rasa.shared.core.slots.UnfeaturizedSlot
-    initial_value: null
-    auto_fill: true
-    influence_conversation: false
+  - phrase_to_tracau
+  - text_for_correction
+  - incomplete_sentence
+  - choices
+
+actions:
+  - action_fallback_chat
+  - action_solve_TOEIC_part5
+  - action_request_to_tracau
+  - action_request_to_tracau_from_slot
+  - action_writing_check
+  - action_writing_check_from_slot
+  - validate_TOEIC_part5_form
+
 responses:
   utter_greet:
   - text: Hey! How are you?
@@ -78,33 +82,34 @@ responses:
   - text: It’s my pleasure.
   - text: Glad to help.
   utter_goodbye:
-  - text: Bye
-  - text: Goodbye
-  - text: See you later
+    - text: Bye
+    - text: Goodbye
+    - text: See you later
+  utter_help:
+    - text: Here what I can do \nSolve multiple choices sentence completion \nLookup a pharase \nText correction \nChatchit with suggestion
   utter_iamabot:
-  - text: I am a bot, built on Rasa framework. I'm here to help you on your journey to improve your English.
-  - text: I am a bot, built with ML and Deep learning. I'm here to assist you in your efforts to improve your English.
-  - text: I am a bot that was created using ML and Deep Learning. I'm here to help you with your English-improvement endeavors.
-  - text: I am a Rasa framework-based bot. I'm here to assist you on your English-improvement quest.
-  utter_ask_sentence:
-  - text: Please give me the incomplete sentence. Remember to mark the word position needed to be filled with underscores
-  - text: Please provide me the missing sentence. Remember to use underscores to indicate the word word that needs to be filled.
-  - text: OK! Give me the paragraph with an underscore.
-  - text: OKAY! Give me the paragraph with an underscore in it.
-  utter_ask_answer_a:
-  - text: Now please give me the answer A.
-  utter_ask_answer_b:
-  - text: Now please, the answer B.
-  utter_ask_answer_c:
-  - text: Next please the answer C.
-  utter_ask_answer_d:
-  - text: And finally the answer D.
+    - text: I am a bot, built on Rasa framework. I'm here to help you on your journey to improve your English.
+    - text: I am a bot, built with ML and Deep learning. I'm here to assist you in your efforts to improve your English.
+    - text: I am a bot that was created using ML and Deep Learning. I'm here to help you with your English-improvement endeavors.
+    - text: I am a Rasa framework-based bot. I'm here to assist you on your English-improvement quest.
+  utter_ask_incomplete_sentence:
+    - text: Please give me the incomplete sentence. Remember to mark the word position needed to be filled with underscores
+    - text: Please provide me the incomplete sentence. Remember to use underscores to indicate the word word that needs to be filled.
+    - text: OK! Give me the sentence with an underscore as missing word.
+    - text: OKAY! Give me the sentence with an underscore in it.
   utter_ask_choices:
-  - text: Now please give me at least 2 possible choices. You can put your answers between commas or use this formula (A)answer A(B)answer B...
-  utter_ask_sentence_and_choices:
-  - text: Please give me the incomplete sentence and at least 2 possible choices.
-  utter_comfirm_sentence_choices_values:
-  - text: 'Your sentence: "{sentence}" & 4 choices: "{answer_a}", "{answer_b}", "{answer_c}", "{answer_d}"'
+    - text: Now please give me at least 2 possible choices. You can put your answers between commas or use this formula (A)answer A(B)answer B...
+  utter_bot_choice:
+    - text: My guess is "{bot_choice}"
+    - text: My final answer is "{bot_choice}"
+    - text: I will choose "{bot_choice}"
+    - text: Hmm, the blank could be "{bot_choice}"
+  utter_ask_incomplete_sentence_type_correctly:
+    - text: Your sentence "{sentence}". That's seem very invalid. I'm assuming you mis-typed
+    - text: Your incomplete sentence "{sentence}"". That might invalid, please retype.
+  utter_ask_choices_type_correctly:
+    - text: Your choices are "{choices}". There is one choice from your input, please giving more than one.
+    - text: Your choices are "{choices}". Your choices seem invalid, please retype.
   utter_ask_phrase_to_tracau:
   - text: Sure! Which phrase do you want to ask?
   - text: Sure thing! The word do you like to inquire about?
@@ -124,24 +129,12 @@ actions:
 - action_request_to_tracau
 - action_writing_check
 forms:
-  english_multiple_choice_sentence_completion_form:
+  TOEIC_part5_form:
     required_slots:
-      answer_a:
-      - type: from_text
-      answer_b:
-      - type: from_text
-      answer_c:
-      - type: from_text
-      answer_d:
-      - type: from_text
-      sentence:
-      - type: from_text
-  english_multiple_choice_sentence_completion_with_list_of_choices_form:
-    required_slots:
+      incomplete_sentence:
+        - type: from_text
       choices:
-      - type: from_text
-      sentence:
-      - type: from_text
+        - type: from_text
   request_to_tracau_form:
     required_slots:
       phrase_to_tracau:
@@ -149,5 +142,18 @@ forms:
   writing_check_form:
     required_slots:
       text_for_correction:
-      - type: from_text
-e2e_actions: []
+        - type: from_text
+
+slots:
+  phrase_to_tracau:
+    type: text
+  text_for_correction:
+    type: text 
+  incomplete_sentence:
+    type: text
+  choices:
+    type: list
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
