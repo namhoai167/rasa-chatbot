@@ -1,9 +1,5 @@
-version: '2.0'
-config:
-  store_entities_as_slots: true
-session_config:
-  session_expiration_time: 60
-  carry_over_slots_to_new_session: false
+version: "2.0"
+
 intents:
   - greet
   - goodbye
@@ -62,9 +58,7 @@ actions:
   - action_fallback_chat
   - action_solve_TOEIC_part5
   - action_request_to_tracau
-  - action_request_to_tracau_from_slot
   - action_writing_check
-  - action_writing_check_from_slot
   - validate_TOEIC_part5_form
 
 responses:
@@ -122,12 +116,7 @@ responses:
   - text: Sure thing! Please provide me with the text to be analyzed.
   - text: Sure! Please send me the text you want me to analyze.
   - text: Without a doubt! Give me the text you want me to look over.
-actions:
-- action_fallback_chat
-- action_solve_multiple_choice_sentence_completion
-- action_solve_multiple_choice_sentence_completion_with_list_of_choices
-- action_request_to_tracau
-- action_writing_check
+
 forms:
   TOEIC_part5_form:
     required_slots:
