@@ -37,8 +37,16 @@ nltk.download('punkt')
 
 language_tool = language_tool_python.LanguageTool('en-US')
 gg = GingerIt()
-ELECTRAmodel = ElectraForMaskedLM.from_pretrained('./electra-small-generator')
-ELECTRAtokenizer = ElectraTokenizer.from_pretrained('./electra-small-generator')
+# Manual download
+# ELECTRA_PATH = './electra-small-generator'
+# BB_PATH = './blenderbot_small-90M'
+# Auto cache at ~/.cache/huggingface/transformers/
+ELECTRA_PATH = 'google/electra-small-generator'
+BB_PATH = 'facebook/blenderbot_small-90M'
+ELECTRAmodel = ElectraForMaskedLM.from_pretrained(ELECTRA_PATH)
+ELECTRAtokenizer = ElectraTokenizer.from_pretrained(ELECTRA_PATH)
+BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(BB_PATH)
+BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
 
 def cut_paragraph(text, maximum_len=300):
     sentences = tokenize.sent_tokenize(text)
@@ -229,10 +237,6 @@ class ActionOnFallBack(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # Load BlenderBot
         # Maybe we should put this in init function or __init__.py later on
-        BB_PATH = './blenderbot_small-90M'
-        BBModel = BlenderbotSmallForConditionalGeneration.from_pretrained(
-            BB_PATH)
-        BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
         latest_user_message = tracker.latest_message['text']
         inputs = BBTokenizer([latest_user_message], return_tensors='pt')
         reply_ids = BBModel.generate(**inputs)
