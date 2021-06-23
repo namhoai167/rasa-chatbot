@@ -4,34 +4,9 @@ nlu:
   ######################
   # TOEIC READING PART 5
   ######################
-  # - intent: request_multiple_choice_sentence_completion
-  #   examples: |
-  #     - can you help me with this multiple choice sentence completion?
-  #     - please solve this sentence that has one blank spot
-  #     - give me the answer for this question of TOEIC reading part 5
-  #     - could you choose the word to complete this sentence
-  #     - could you choose the phrase that best completes the sentence from four choices
-
-  # - intent: reply_with_multiple_choice
-  #   examples: |
-  #     - [will begin](choices), [had begun](choices), [has begun](choices), [is beginning](choices)
-  #     - (A)[When](choices) (B)[Before](choices) (C)[Whereas](choices) (D)[Since](choices)
-  #     - (A) [instruct](choices) (B) [instructing](choices) (C) [instructions](choices) (D) [instructional](choices)
-  #     - (A)[among](choices)(B)[up](choices)(C)[at](choices)(D)[of](choices)
-  #     - A.[will create](choices) B.[was created](choices) C.[having created](choices) D.[had been creating](choices)
-
-  # - intent: request_multiple_choice_sentence_completion_with_list_of_sentence_and_choices
-  #   examples: |
-  #     - can you help me with this multiple choice sentence completion [Your new coffee machine comes with detailed _ which will help you use it more effectively.](sentence_and_choices)(A)[instruct](sentence_and_choices)(B)[instructing](sentence_and_choices)(C)[instructions](sentence_and_choices)(D)[instructional](sentence_and_choices)
-  #     - please solve this sentence that has one blank spot [Either the marketing director or the sales manager will represent Centum Construction Inc. _ the Bexco Architecture Conference.](sentence_and_choices) (A) [among](sentence_and_choices) (B) [up](sentence_and_choices) (C) [at](sentence_and_choices) (D) [of](sentence_and_choices)
-  #     - give me the answer for this question of TOEIC reading part 5 [Following the visit to your production facility in Hong Kong next week, we _ a comprehensive factory automation program to meet your company's needs.](sentence_and_choices) A.[will create](sentence_and_choices B.[was created](sentence_and_choices) C.[having created](sentence_and_choices) D.[had been creating](sentence_and_choices)
-  #     - could you choose the word to complete this sentence [_ she joined our company three years ago, Mrs. Mashimo has greatly expanded our customer base.](sentence_and_choices)(A)[When](sentence_and_choices) (B)[Before](sentence_and_choices) (C)[Whereas](sentence_and_choices) (D)[Since](sentence_and_choices)
-  #     - could you choose the phrase that best completes the sentence from four choices [The company _ working on the project for the main office even before it chose the land to build on.](sentence_and_choices)[will begin](sentence_and_choices), [had begun](sentence_and_choices), [has begun](sentence_and_choices), [is beginning](sentence_and_choices)
-
   - regex: incomplete_sentence
     examples: |
-      - (?<=").*([_]+|[-]{2,}).*?(?="\(A\))
-      - (?<=:).*([_]+|[-]{2,}).*?(?=\(A\))
+      - (?<=").*([_]+|[-]{2,}).*?(?="\(A\))|(?<=:).*([_]+|[-]{2,}).*?(?=\(A\))
   - regex: choices
     examples: |
       - (?<=\([Aa]\)).*?(?=\([Bb]\))
@@ -45,22 +20,20 @@ nlu:
       - give me the answer for this question of TOEIC reading part 5
       - could you choose the word to complete this sentence
       - could you choose the phrase that best completes the sentence from four choices
+      - sentence completion
       - can you help me with this multiple choice sentence completion: [Mr. Holt's acceptance of the financial executive position is -------his satisfaction with the salary offer.](incomplete_sentence)(A)[ in contrast to](choices)(B)[dependent on](choices)(C)[ as opposed to](choices)(D)[ on condition that](choices)
-      - please solve this sentence: [The assets of Marble Faun Publishing Company------- last quarter when one of their main local distributors went out of business.](incomplete_sentence)(A)[suffer](choices)(B)[suffers](choices)(C)[suffering](choices)(D)[suffered](choices)
+      - please solve this sentence: [The assets of Marble Faun Publishing Company----- last quarter when one of their main local distributors went out of business.](incomplete_sentence)(A)[suffer](choices)(B)[suffers](choices)(C)[suffering](choices)(D)[suffered](choices)
       - give me the answer for this question of TOEIC reading part 5: [lndie film director Luke Steele will be in London for the premiere of _ new movie.](incomplete_sentence)(a)[him](choices)(b)[his](choices)(c)[himself](choices)(d)[he](choices)
       - could you choose the word to complete this sentence: [Laboratory employees are expected to wear a name tag and carry identification at- times.](incomplete_sentence)(a)[full](choices)(b)[complete](choices)(c)[all](choices)(d)[total](choices)
-      - could you choose the phrase that best completes the sentence from four choices:[ The latest training_ contains tips on teaching a second language to international students.](incomplete_sentence)(A)[method](choices)(B)[guide](choices)(C)[staff](choices)(D)[role](choices)
+      - could you choose the phrase that best completes the sentence from four choices:[ The latest training___ contains tips on teaching a second language to international students.](incomplete_sentence)(A)[method](choices)(B)[guide](choices)(C)[staff](choices)(D)[role](choices)
+      - sentence completion: Ursa Major Corp. has _____negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](incomplete_sentence)(A)[soon](choices)(B)[shortly](choices)(C)[recently](choices)(D)[yet](choices)
       - "[Ursa Major Corp. has _negotiated a deal with a Russian competitor in surveying the Kamchatka Peninsula.](incomplete_sentence)"(A)[soon](choices)(B)[shortly](choices)(C)[recently](choices)(D)[yet](choices)
       - "[Ms. Cho relayed her concerns about the company's financial situation while she __ a meeting with the manager.](incomplete_sentence)"(A)[having](choices)(B)[will have](choices)(C)[was having](choices)(D)[has](choices)
       - "[Whether it is _ to register for a student discount card depends on the needs of the individual.](incomplete_sentence)"(a)[necessary](choices)(b)[necessarily](choices)(c)[necessitate](choices)(d)[necessity](choices)
-      - "[Even experienced clerks are encouraged to attend training -------to keep them updated on new ideas in the world of banking.](incomplete_sentence)"(a)[materials](choices)(b)[sessions](choices)(c)[experiences](choices)(d)[positions](choices)
-      - "[Workers are advised not to operate certain machines by -------.](incomplete_sentence)"(A)[they](choices)(B)[them](choices)(C)[their](choices)(D)[themselves](choices)
-    
-  # GRAMMARTICAL CONJUGATION
-  # - intent: request_grammatical_conjugation
-  #   example: |
-  #     - Grammatical conjugation
-  #     - Give me the right form of this word
+      - "[Even experienced clerks are encouraged to attend training ---to keep them updated on new ideas in the world of banking.](incomplete_sentence)"(a)[materials](choices)(b)[sessions](choices)(c)[experiences](choices)(d)[positions](choices)
+      - "[Workers are advised not to operate certain machines by --.](incomplete_sentence)"(A)[they](choices)(B)[them](choices)(C)[their](choices)(D)[themselves](choices)
+      - "[Mr. Holt's acceptance of the financial executive position is ------his satisfaction with the salary offer.]"(incomplete_sentence)(A)[ in contrast to](choices)(B)[dependent on](choices)(C)[ as opposed to](choices)(D)[ on condition that](choices)
+      - "[The assets of Marble Faun Publishing Company____ last quarter when one of their main local distributors went out of business.]"(incomplete_sentence)(A)[suffer](choices)(B)[suffers](choices)(C)[suffering](choices)(D)[suffered](choices)
 
   # FILL BLANK (Developing)
   - intent: request_fill_blank
@@ -407,243 +380,243 @@ nlu:
   ############
   # BLENDERBOT
   ############
-  # - intent: nlu_fallback
-  #   examples: |
-  #     - good morning
-  #     - hi can you speak ?
-  #     - good evening
-  #     - good afternoon
-  #     - good day
-  #     - How did you come into being?
-  #     - How did you come to be?
-  #     - How exactly were you devised?
-  #     - How exactly were you made?
-  #     - How were you built?
-  #     - How were you conceived?
-  #     - How were you constructed?
-  #     - How were you devised?
-  #     - How were you formed?
-  #     - How were you made into who you are?
-  #     - How were you made?
-  #     - How were you materialized?
-  #     - How were you set up?
-  #     - I want to know how you were formed
-  #     - I'd like to know how you were created
-  #     - I'd like to know how you were put together?
-  #     - In what manner were you built?
-  #     - In what manner were you constructed?
-  #     - In what manner were you formed?
-  #     - In what way were you created?
-  #     - In what way were you formed?
-  #     - In what way were you made?
-  #     - In what way were you shaped?
-  #     - In which manner were you devised?
-  #     - Let me know how you were made exactly
-  #     - Specify how you were created?
-  #     - Tell me how you were made?
-  #     - What process was used to build you?
-  #     - What process was used to create you?
-  #     - What was the process for making you?
-  #     - You originated through what means?
-  #     - how have you been built?
-  #     - how were you made?
-  #     - in what way were you made?
-  #     - so how were you made?
-  #     - what are you made of
-  #     - Are you ok?
-  #     - Do you feel good?
-  #     - Do you have a great day?
-  #     - HI, what are you up to?
-  #     - Hi! How are you?
-  #     - How are You?
-  #     - How are things?
-  #     - How are you
-  #     - How's life treating you friend?
-  #     - How've you been?
-  #     - Hows it going
-  #     - I'm fine and you
-  #     - Is everything ok?
-  #     - What's going on?
-  #     - What's new?
-  #     - What's up
-  #     - What's up man
-  #     - and you
-  #     - are you alright
-  #     - are you happy
-  #     - are you having a good day
-  #     - are you ok
-  #     - are you okay
-  #     - h r u ?
-  #     - hello, how are you?
-  #     - hey how are you?
-  #     - hi how are you?
-  #     - hi how u doing
-  #     - hi sara, how are you?
-  #     - how ?
-  #     - how are things going
-  #     - how are things with you?
-  #     - how are u
-  #     - how are u?
-  #     - how are you doing?
-  #     - how have you been
-  #     - how is it going
-  #     - how is your day
-  #     - how is your day going
-  #     - how is your evening
-  #     - how r u
-  #     - how r u ?
-  #     - how r u>
-  #     - how's it going?
-  #     - how's life
-  #     - how's life been treating you?
-  #     - how's your day going
-  #     - howareyou
-  #     - hw r u?
-  #     - is everything all right
-  #     - is everything okay
-  #     - nah, I'm good - how are you doing?
-  #     - okay hi how are you?
-  #     - what about your day
-  #     - what are you up to?
-  #     - what's good
-  #     - whatchcha doing
-  #     - whatchya upto ?
-  #     - whats goin on
-  #     - whats new
-  #     - whatsapp
-  #     - yow are you
-  #     - Do you have friends the same age as you, if so, how old are they?
-  #     - How long have you been alive?
-  #     - How long have you been around?
-  #     - How long have you occupied the earth?
-  #     - How many candles were on your last birthday cake?
-  #     - How many years have you been alive?
-  #     - What is your birthdate?
-  #     - What is your count of years being alive so far?
-  #     - What was your age on your last birthday?
-  #     - do you know how old you are?
-  #     - give me your age?
-  #     - how about your age
-  #     - how aold are you
-  #     - how many ages?
-  #     - how many years old are you?
-  #     - how old are u
-  #     - how old are you
-  #     - how old are you?
-  #     - how old were you on your last birthday?
-  #     - what number represents your age?
-  #     - what year were you born?
-  #     - what's your age?
-  #     - whats your age?
-  #     - whats your birth year?
-  #     - when is your birthday?
-  #     - when were you born?
-  #     - when you were bon
-  #     - What can I ask you?
-  #     - What can I do?
-  #     - What can you demo
-  #     - What can you tell me?
-  #     - What do you do
-  #     - anything els
-  #     - are there any other options?
-  #     - can I ask you anything else?
-  #     - can you do anything else?
-  #     - can you help me
-  #     - can you help me?
-  #     - come back
-  #     - cool! can I do something else here?
-  #     - hello what can you do for me
-  #     - help
-  #     - help me
-  #     - i need help
-  #     - more info
-  #     - now what?
-  #     - options
-  #     - show me the menu
-  #     - show me what's possible
-  #     - so now what
-  #     - so what can you do
-  #     - so what can you do?
-  #     - so what can you help me with?
-  #     - so what next?
-  #     - talk to me
-  #     - talk to me!
-  #     - tell me something you can do
-  #     - tell me what's your skill
-  #     - um what now
-  #     - what are all the things you understand?
-  #     - what are the options?
-  #     - what are you ding
-  #     - what are you doing
-  #     - what are you good at?
-  #     - What location are you from?
-  #     - What state were you born in?
-  #     - What's the name of the place you came from?
-  #     - Where are you located?
-  #     - Where are you?
-  #     - Where are your origins?
-  #     - Where are your roots?
-  #     - Where did you come from?
-  #     - Where did you grow up?
-  #     - Where did you originate?
-  #     - Where do you come from?
-  #     - Where do you consider home?
-  #     - Where do you live?
-  #     - Where from?
-  #     - Where might you be from?
-  #     - Where were you at before you were here?
-  #     - Where were you born?
-  #     - You live around here?
-  #     - You were conceived in what location?
-  #     - are you from around here?
-  #     - what country are you from?
-  #     - where are from
-  #     - I am asking you an out of scope question
-  #     - 4 + 2 = ?
-  #     - After registration I see that I have an available balance of 0.00000000. What does this balance represent?
-  #     - Are you ready?
-  #     - But you're an english site :(
-  #     - Can I ask you questions first?
-  #     - Can I die
-  #     - Can I get a hamburger?
-  #     - I am hungry
-  #     - I am trying to build one, and did some research before, but I have not do hand-on work yet
-  #     - I want to die
-  #     - I want to order pizza
-  #     - I want to use pipe
-  #     - I will check
-  #     - Is this Goal-Oriented Chatbot?
-  #     - Is today saturday?
-  #     - Mail me the guide
-  #     - Make me a sandwich
-  #     - NLW
-  #     - Nice name
-  #     - Now?
-  #     - Pizza bot
-  #     - Recharge
-  #     - SEL ME SOMETHING
-  #     - The Try it out is not working
-  #     - The weather is good
-  #     - Today
-  #     - better than you
-  #     - call me father
-  #     - can you help me with your docs
-  #     - kiss me
-  #     - you have to
-  #     - what type of bot?
-  #     - sfasd
-  #     - asdkjasdhjkasd
-  #     - j  bhbhj
-  #     - eshdtjfjfyk
-  #     - drhdtjfjfyj
-  #     - sudo reboot
-  #     - asdfgasd
-  #     - asdfgasdas
-  #     - who is Joe Biden?
-  #     - tell me a joke.
-  #     - who is the most tallest in the world
-  #     - who is me?
-  #     - make an essay
-  #     - find me a dog.
-  #     - y
-  #     - this is a fallback intent
+  - intent: nlu_fallback
+    examples: |
+      - good morning
+      - hi can you speak ?
+      - good evening
+      - good afternoon
+      - good day
+      - How did you come into being?
+      - How did you come to be?
+      - How exactly were you devised?
+      - How exactly were you made?
+      - How were you built?
+      - How were you conceived?
+      - How were you constructed?
+      - How were you devised?
+      - How were you formed?
+      - How were you made into who you are?
+      - How were you made?
+      - How were you materialized?
+      - How were you set up?
+      - I want to know how you were formed
+      - I'd like to know how you were created
+      - I'd like to know how you were put together?
+      - In what manner were you built?
+      - In what manner were you constructed?
+      - In what manner were you formed?
+      - In what way were you created?
+      - In what way were you formed?
+      - In what way were you made?
+      - In what way were you shaped?
+      - In which manner were you devised?
+      - Let me know how you were made exactly
+      - Specify how you were created?
+      - Tell me how you were made?
+      - What process was used to build you?
+      - What process was used to create you?
+      - What was the process for making you?
+      - You originated through what means?
+      - how have you been built?
+      - how were you made?
+      - in what way were you made?
+      - so how were you made?
+      - what are you made of
+      - Are you ok?
+      - Do you feel good?
+      - Do you have a great day?
+      - HI, what are you up to?
+      - Hi! How are you?
+      - How are You?
+      - How are things?
+      - How are you
+      - How's life treating you friend?
+      - How've you been?
+      - Hows it going
+      - I'm fine and you
+      - Is everything ok?
+      - What's going on?
+      - What's new?
+      - What's up
+      - What's up man
+      - and you
+      - are you alright
+      - are you happy
+      - are you having a good day
+      - are you ok
+      - are you okay
+      - h r u ?
+      - hello, how are you?
+      - hey how are you?
+      - hi how are you?
+      - hi how u doing
+      - hi sara, how are you?
+      - how ?
+      - how are things going
+      - how are things with you?
+      - how are u
+      - how are u?
+      - how are you doing?
+      - how have you been
+      - how is it going
+      - how is your day
+      - how is your day going
+      - how is your evening
+      - how r u
+      - how r u ?
+      - how r u>
+      - how's it going?
+      - how's life
+      - how's life been treating you?
+      - how's your day going
+      - howareyou
+      - hw r u?
+      - is everything all right
+      - is everything okay
+      - nah, I'm good - how are you doing?
+      - okay hi how are you?
+      - what about your day
+      - what are you up to?
+      - what's good
+      - whatchcha doing
+      - whatchya upto ?
+      - whats goin on
+      - whats new
+      - whatsapp
+      - yow are you
+      - Do you have friends the same age as you, if so, how old are they?
+      - How long have you been alive?
+      - How long have you been around?
+      - How long have you occupied the earth?
+      - How many candles were on your last birthday cake?
+      - How many years have you been alive?
+      - What is your birthdate?
+      - What is your count of years being alive so far?
+      - What was your age on your last birthday?
+      - do you know how old you are?
+      - give me your age?
+      - how about your age
+      - how aold are you
+      - how many ages?
+      - how many years old are you?
+      - how old are u
+      - how old are you
+      - how old are you?
+      - how old were you on your last birthday?
+      - what number represents your age?
+      - what year were you born?
+      - what's your age?
+      - whats your age?
+      - whats your birth year?
+      - when is your birthday?
+      - when were you born?
+      - when you were bon
+      - What can I ask you?
+      - What can I do?
+      - What can you demo
+      - What can you tell me?
+      - What do you do
+      - anything els
+      - are there any other options?
+      - can I ask you anything else?
+      - can you do anything else?
+      - can you help me
+      - can you help me?
+      - come back
+      - cool! can I do something else here?
+      - hello what can you do for me
+      - help
+      - help me
+      - i need help
+      - more info
+      - now what?
+      - options
+      - show me the menu
+      - show me what's possible
+      - so now what
+      - so what can you do
+      - so what can you do?
+      - so what can you help me with?
+      - so what next?
+      - talk to me
+      - talk to me!
+      - tell me something you can do
+      - tell me what's your skill
+      - um what now
+      - what are all the things you understand?
+      - what are the options?
+      - what are you ding
+      - what are you doing
+      - what are you good at?
+      - What location are you from?
+      - What state were you born in?
+      - What's the name of the place you came from?
+      - Where are you located?
+      - Where are you?
+      - Where are your origins?
+      - Where are your roots?
+      - Where did you come from?
+      - Where did you grow up?
+      - Where did you originate?
+      - Where do you come from?
+      - Where do you consider home?
+      - Where do you live?
+      - Where from?
+      - Where might you be from?
+      - Where were you at before you were here?
+      - Where were you born?
+      - You live around here?
+      - You were conceived in what location?
+      - are you from around here?
+      - what country are you from?
+      - where are from
+      - I am asking you an out of scope question
+      - 4 + 2 = ?
+      - After registration I see that I have an available balance of 0.00000000. What does this balance represent?
+      - Are you ready?
+      - But you're an english site :(
+      - Can I ask you questions first?
+      - Can I die
+      - Can I get a hamburger?
+      - I am hungry
+      - I am trying to build one, and did some research before, but I have not do hand-on work yet
+      - I want to die
+      - I want to order pizza
+      - I want to use pipe
+      - I will check
+      - Is this Goal-Oriented Chatbot?
+      - Is today saturday?
+      - Mail me the guide
+      - Make me a sandwich
+      - NLW
+      - Nice name
+      - Now?
+      - Pizza bot
+      - Recharge
+      - SEL ME SOMETHING
+      - The Try it out is not working
+      - The weather is good
+      - Today
+      - better than you
+      - call me father
+      - can you help me with your docs
+      - kiss me
+      - you have to
+      - what type of bot?
+      - sfasd
+      - asdkjasdhjkasd
+      - j  bhbhj
+      - eshdtjfjfyk
+      - drhdtjfjfyj
+      - sudo reboot
+      - asdfgasd
+      - asdfgasdas
+      - who is Joe Biden?
+      - tell me a joke.
+      - who is the most tallest in the world
+      - who is me?
+      - make an essay
+      - find me a dog.
+      - y
+      - this is a fallback intent

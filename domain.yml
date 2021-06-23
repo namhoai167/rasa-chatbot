@@ -14,9 +14,6 @@ intents:
   - request_fill_blank
 
 # TOEIC READING PART 5
-# - reply_with_multiple_choice
-  # - request_multiple_choice_sentence_completion:
-  #     use_entities: []
   - request solve TOEIC part5:
       ignore_entities:
         - phrase_to_tracau
@@ -64,6 +61,7 @@ actions:
   - action_request_to_tracau_from_slot
   - action_writing_check
   - action_writing_check_from_slot
+  - validate_TOEIC_part5_form
 
 responses:
   utter_greet:
@@ -105,30 +103,16 @@ responses:
   utter_ask_choices:
     - text: Now please give me at least 2 possible choices. You can put your answers between commas or use this formula (A)answer A(B)answer B...
   utter_bot_choice:
-    - text: My guess is {bot_choice}
-    - text: My final answer is {bot_choice}
-    - text: I will choose {bot_choice}
-    - text: Hmm, the blank could be {bot_choice}
+    - text: My guess is "{bot_choice}"
+    - text: My final answer is "{bot_choice}"
+    - text: I will choose "{bot_choice}"
+    - text: Hmm, the blank could be "{bot_choice}"
   utter_ask_incomplete_sentence_type_correctly:
-    - text: Your sentence "{sentence}" \n That's seem very short or invalid. I'm assuming you mis-typed
-    - text: Your incomplete sentence '{sentence}' \n That might invalid, do you want to continue?
-      buttons:
-      - title: "yes"
-        payload: "/affirm"
-      - title: "no, retype"
-        payload: "/deny"
-      - title: "cancel"
-        payload: "/cancel"
+    - text: Your sentence "{sentence}". That's seem very invalid. I'm assuming you mis-typed
+    - text: Your incomplete sentence "{sentence}"". That might invalid, please retype.
   utter_ask_choices_type_correctly:
-    - text: Your choices are '{choicez}' \n There is one choice from your input, we might give you the same answer
-    - text: Your choices are "{choicez}" \n Your choices seem invalid, do you want to continue?
-      buttons:
-      - title: "yes"
-        payload: "/affirm"
-      - title: "no, retype"
-        payload: "/deny"
-      - title: "cancel"
-        payload: "/cancel"
+    - text: Your choices are "{choices}". There is one choice from your input, please giving more than one.
+    - text: Your choices are "{choices}". Your choices seem invalid, please retype.
   utter_ask_phrase_to_tracau:
     - text: Sure! Which phrase do you want to ask?
     - text: Sure thing! The word do you like to inquire about?
@@ -148,10 +132,6 @@ forms:
         - type: from_text
       choices:
         - type: from_text
-#  english_multiple_choice_sentence_completion_with_list_of_sentence_and_choices_form:
-#    required_slots:
-#     sentence_and_choices:
-#        - type: from_text
   request_to_tracau_form:
     required_slots:
       phrase_to_tracau:
@@ -170,10 +150,6 @@ slots:
     type: text
   choices:
     type: list
-  incomplete_sentence_type_correctly:
-    type: text
-  choices_type_correctly:
-    type: text
 
 session_config:
   session_expiration_time: 60

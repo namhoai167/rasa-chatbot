@@ -10,7 +10,7 @@ rules:
       - action: TOEIC_part5_form
       - active_loop: TOEIC_part5_form
 
-  - rule: Submit and solve TOEIC part5 form with list of choices
+  - rule: Submit and solve TOEIC part5 form
     condition:
       - active_loop: TOEIC_part5_form
     steps:

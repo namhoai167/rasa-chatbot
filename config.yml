@@ -25,9 +25,10 @@ pipeline:
     # use_shared_vocab: False
 
   - name: DIETClassifier
-    model_confidence: linear_norm
-    constrain_similarities: True
-    epochs: 30    # Muc nay loss giam nhung acc khong tang nua
+    # [BUG] This two parameter lower confidence of every intent, so it mess up with nlu_fallback
+    # model_confidence: linear_norm
+    # constrain_similarities: True
+    epochs: 50    # Muc 30 loss giam nhung acc khong tang nua
     # can turn off cause we are using Regex Entity Extractor
     entity_recognition: False
 
@@ -41,12 +42,12 @@ pipeline:
 
   - name: EntitySynonymMapper
   - name: ResponseSelector  # https://rasa.com/docs/rasa/2.3.x/migration-guide#machine-learning-components-1
-    model_confidence: linear_norm
-    constrain_similarities: True
+    # model_confidence: linear_norm
+    # constrain_similarities: True
     epochs: 100
 
   - name: FallbackClassifier
-    threshold: 0.49
+    threshold: 0.7
     # ambiguity_threshold: 0.1
 
 # Configuration for Rasa Core.

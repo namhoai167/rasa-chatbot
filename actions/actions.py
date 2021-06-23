@@ -156,8 +156,6 @@ class ActionOnFallBack(Action):
             BB_PATH)
         BBTokenizer = BlenderbotSmallTokenizer.from_pretrained(BB_PATH)
         latest_user_message = tracker.latest_message['text']
-        correction = correct_language_tool(latest_user_message, language_tool)
-        correction = correct_gingerit(correction, gg)
         inputs = BBTokenizer([latest_user_message], return_tensors='pt')
         reply_ids = BBModel.generate(**inputs)
         bot_reply = BBTokenizer.batch_decode(
@@ -165,96 +163,19 @@ class ActionOnFallBack(Action):
         bot_reply = " ".join([sent.capitalize() for sent in split_into_sentences(
             str(bot_reply), string=False)])
         dispatcher.utter_message(text=bot_reply)
+        correction = correct_language_tool(latest_user_message, language_tool)
+        correction = correct_gingerit(correction, gg)
         if latest_user_message.casefold() != correction.casefold():
             dispatcher.utter_message(
                 "Small note: I found some mistakes in your message! Did you mean \"{0}\"?".format(correction))
         return [AllSlotsReset()]
 
-
+# https://rasa.com/docs/rasa/forms#validating-form-input
 # https://rasa.com/docs/rasa/forms#dynamic-form-behavior
 # https://github.com/RasaHQ/rasa-form-examples/blob/main/06-custom-name-experience/actions/actions.py
 class ValidateTOEICpart5Form(FormValidationAction):
     def name(self) -> Text:
         return "validate_TOEIC_part5_form"
-    
-    async def required_slots(
-        self,
-        slots_mapped_in_domain: List[Text],
-        dispatcher: "CollectingDispatcher",
-        tracker: "Tracker",
-        domain: "DomainDict",
-    ) -> Optional[List[Text]]:
-
-        # Trigger when sentence too short. If the incomple sentence too short, maybe it just a word
-        # Or there are no _ or -- to MASK in sentence
-        sentence = tracker.get_slot("incomplete_sentence")
-        if sentence is not None:
-            if len(sentence) < 20 or not re.search(r'[_]+|[-]{2,}', sentence):
-                dispatcher.utter_message(template="utter_ask_incomplete_sentence_type_correctly", sentence=sentence)
-                return ["incomplete_sentence_type_correctly"] + slots_mapped_in_domain
-
-        # Trigger when only one choices
-        choices = tracker.get_slot("choices")
-        if choices is not None:
-            if isinstance(choices, str):
-                choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices)
-            elif isinstance(choices, list) and len(choices) == 1:
-                choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices[0])
-            choices = [x for x in choices if x.strip()]
-            if len(choices) < 2:
-                dispatcher.utter_message(template="utter_ask_choices_type_correctly", choicez=choices)
-                return ["choices_type_correctly"] + slots_mapped_in_domain
-        return slots_mapped_in_domain
-    
-    async def extract_incomplete_sentence_type_correctly(
-        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
-    ) -> Dict[Text, Any]:
-        intent = tracker.get_intent_of_latest_message()
-        if intent not in ["affirm", "deny", "cancel"]:
-            return {"incomplete_sentence_type_correctly": None}
-        return {"incomplete_sentence_type_correctly": intent}
-
-    async def extract_choices_type_correctly(
-        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
-    ) -> Dict[Text, Any]:
-        intent = tracker.get_intent_of_latest_message()
-        if intent not in ["affirm", "deny", "cancel"]:
-            return {"choices_type_correctly": None}
-        return {"choices_type_correctly": intent}
-
-    def validate_choices_type_correctly(
-        self,
-        slot_value: Any,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
-        """Validate `choices_type_correctly` value."""
-        user_intent = tracker.get_slot("choices_type_correctly")
-        if user_intent == "affirm":
-            return {"choices": tracker.get_slot("choices"), "choices_type_correctly": "affirm"}
-        elif user_intent == "deny":
-            return {"choices": None, "choices_type_correctly": "deny"}
-        elif user_intent == "cancel":
-            return ActionExecutionRejection()
-        return {"choices": None, "choices_type_correctly": None}
-
-    def validate_incomplete_sentence_type_correctly(
-        self,
-        slot_value: Any,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: DomainDict,
-    ) -> Dict[Text, Any]:
-        """Validate `incomplete_sentence_type_correctly` value."""
-        user_intent = tracker.get_slot("incomplete_sentence_type_correctly")
-        if user_intent == "affirm":
-            return {"incomplete_sentence": tracker.get_slot("incomplete_sentence"), "incomplete_sentence_type_correctly": "affirm"}
-        elif user_intent == "deny":
-            return {"incomplete_sentence": None, "incomplete_sentence_type_correctly": "deny"}
-        elif user_intent == "cancel":
-            return ActionExecutionRejection()
-        return {"incomplete_sentence": None, "incomplete_sentence_type_correctly": None}
 
     def validate_incomplete_sentence(
         self,
@@ -263,12 +184,13 @@ class ValidateTOEICpart5Form(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        print(slot_value)
-        if len(slot_value) < 20 or not re.search(r'[_]+|[-]{2,}', slot_value):
-            dispatcher.utter_message(template="utter_ask_incomplete_sentence_type_correctly", sentence=slot_value)
+        # Trigger when sentence too short. If the incomple sentence too short, maybe it just a word
+        # Or there are no _ or -- to MASK in sentence
+        print('sentence: ', slot_value)
+        if len(slot_value) <= 20 or not re.search(r'[_]+|[-]{2,}', slot_value):
+            dispatcher.utter_message(response="utter_ask_incomplete_sentence_type_correctly", sentence=slot_value)
             return {"incomplete_sentence": None}
-        else:
-            return {"incomplete_sentence": slot_value}
+        return {"incomplete_sentence": slot_value}
 
     def validate_choices(
         self,
@@ -277,17 +199,22 @@ class ValidateTOEICpart5Form(FormValidationAction):
         tracker: Tracker,
         domain: DomainDict,
     ) -> Dict[Text, Any]:
-        print(slot_value)
+        # Trigger when only one choices
+        print("choices: ", slot_value)
         if isinstance(slot_value, str):
             choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', slot_value)
+            print("str: ", choices)
         elif isinstance(slot_value, list) and len(slot_value) == 1:
             choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', slot_value[0])
-        choices = [x for x in choices if x.strip()]
-        if len(choices) < 2:
-            dispatcher.utter_message(template="utter_ask_choices_type_correctly", choicez=choices)
-            return {"choices": None}
+            print("list1: ", choices)
         else:
-            return {"choices": slot_value}
+            choices = slot_value
+        choices = [x.strip() for x in choices if x.strip()]
+        print("list2: ", choices)
+        if len(choices) < 2:
+            dispatcher.utter_message(response="utter_ask_choices_type_correctly", choices=choices)
+            return {"choices": None}
+        return {"choices": choices}
                      
 
 class ActionSolveMultipleChoiceSentenceCompletion(Action):
@@ -303,14 +230,9 @@ class ActionSolveMultipleChoiceSentenceCompletion(Action):
         sentence = re.sub(r'[_]+|[-]{2,}', '***mask***', sentence)
 
         choices = tracker.get_slot("choices")
-        if isinstance(choices, str):
-            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices)
-        elif isinstance(choices, list) and len(choices) == 1:
-            choices = re.split(r'\([A-Da-d]\)|[A-Da-d]\s+?\.|\n+|,', choices[0])
-        choices = [x for x in choices if x.strip()]
         bot_answer_choice = fb.rank(sentence, options=choices)[0]
         dispatcher.utter_message(
-            template="utter_bot_choice", 
+            response="utter_bot_choice", 
             bot_choice=bot_answer_choice
         )
 
