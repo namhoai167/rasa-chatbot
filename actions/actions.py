@@ -7,6 +7,7 @@
 import cv2
 from skimage import io
 import pytesseract
+import matplotlib.pyplot as plt
 from gingerit.gingerit import GingerIt
 import language_tool_python
 from typing import Any, Text, Dict, List
@@ -192,7 +193,7 @@ def rotateImage(cvImage, angle: float):
 
 def deskew(cvImage):
     angle = getSkewAngle(cvImage)
-    return rotateImage(cvImage, -1.0 * angle)
+    return rotateImage(cvImage, -1.0 * angle - 90.0)
 
 
 def ocr(img_url) -> str:
@@ -207,10 +208,13 @@ def ocr(img_url) -> str:
     image = cv2.medianBlur(image, 3)
     image = deskew(image)
     image = cv2.bitwise_not(image)
-    kernel = np.ones((2,2),np.uint8)
+    kernel = np.ones((2, 2), np.uint8)
     image = cv2.erode(image, kernel, iterations=1)
     image = cv2.bitwise_not(image)
     text = str(((pytesseract.image_to_string(image))))
+    text = re.sub(r"[\n]{2,}", ". ", text)
+    text = re.sub(r"\n(?=[A-Z])", ". ", text)
+    text = re.sub(r"\n(?=[^A-Z])", " ", text)
     return text
 
 
@@ -464,7 +468,7 @@ class ActionRequestToTracau(Action):
                     html = respond['tratu'][0]['fields']['fulltext']
                 except:
                     list_sentences = [sent['fields']
-                                    for sent in respond['sentences']]
+                                      for sent in respond['sentences']]
                     list_return = []
                     for sentence in list_sentences:
                         en = BeautifulSoup(
@@ -481,16 +485,16 @@ class ActionRequestToTracau(Action):
             parsed_html = BeautifulSoup(html, features="lxml")
             if parsed_html.find("article", {'data-tab-name': "Ngữ pháp"}):
                 l = [x for x in parsed_html.find("article", {
-                                                'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
+                    'data-tab-name': "Ngữ pháp"}).find("div", {'class': "dict--content"}).children]
             elif parsed_html.find("article", {'data-tab-name': "Thành ngữ"}):
                 l = [x for x in parsed_html.find("article", {
-                                                'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
+                    'data-tab-name': "Thành ngữ"}).find("div", {'class': "dict--content"}).children]
             elif parsed_html.find("article", {'data-tab-name': "Anh - Anh"}):
                 l = [x for x in parsed_html.find("article", {
-                                                'data-tab-name': "Anh - Anh"}).find("div", {'class': "dict--content"}).children]
+                    'data-tab-name': "Anh - Anh"}).find("div", {'class': "dict--content"}).children]
             elif parsed_html.find("article", {'data-tab-name': "Anh - Việt"}):
                 l = [x for x in parsed_html.find("article", {
-                                                'data-tab-name': "Anh - Việt"}).find("div", {'class': "dict--content"}).children]
+                    'data-tab-name': "Anh - Việt"}).find("div", {'class': "dict--content"}).children]
             else:
                 dispatcher.utter_message(
                     text="Sorry, I can't find the phrase {0} in the database".format(query))
@@ -505,12 +509,15 @@ class ActionRequestToTracau(Action):
                         if child.string:
                             l2.append(child.string)
                 else:
-                    l2.append(element.getText())
+                    try:
+                        l2.append(element.getText())
+                    except:
+                        l2.append(element)
 
             dispatcher.utter_message(text='\n'.join(
                 [string for string in l2 if string]))
         except:
-            dispatcher.utter_message("Sorry, I have some trouble understanding you :( Please rephrase your question.")
+            dispatcher.utter_message("Sorry, there's an error occured :(")
         return [AllSlotsReset()]
 
 
@@ -548,6 +555,7 @@ class ActionRequestToTracau(Action):
         return [AllSlotsReset()]
 '''
 
+
 class ActionWritingCheck(Action):
     def name(self) -> Text:
         return "action_writing_check"
@@ -558,14 +566,17 @@ class ActionWritingCheck(Action):
         # Remember to fix /python3.8/site-packages/rasa/core/channels/console.py line DEFAULT_STREAM_READING_TIMEOUT_IN_SECONDS = 10 to 30
         try:
             text = tracker.get_slot("text_for_correction").strip()
+            #dispatcher.utter_message('Your image url: ' + text)
             try:
                 scanned_text = ocr(text)
+                #dispatcher.utter_message('Scanned text: ' + scanned_text)
                 try:
                     dispatcher.utter_message(
                         'Here are some mistakes that I found:')
                     errors = print_errors(scanned_text, language_tool, gg)
                     dispatcher.utter_message(errors)
-                    dispatcher.utter_message("Here is the text after correction:")
+                    dispatcher.utter_message(
+                        "Here is the text after correction:")
                     corrected_text = correct_language_tool(
                         correct_gingerit(scanned_text, gg), language_tool)
                     dispatcher.utter_message(corrected_text)
@@ -576,13 +587,14 @@ class ActionWritingCheck(Action):
                         "Hooray! I did not find any errors in your provided text.")
             except:
                 try:
+                    errors = print_errors(text, language_tool, gg)
                     dispatcher.utter_message(
                         'Here are some mistakes that I found:')
-                    errors = print_errors(text, language_tool, gg)
                     dispatcher.utter_message(errors)
-                    dispatcher.utter_message("Here is the text after correction:")
                     corrected_text = correct_language_tool(
                         correct_gingerit(text, gg), language_tool)
+                    dispatcher.utter_message(
+                        "Here is the text after correction:")
                     dispatcher.utter_message(corrected_text)
                     dispatcher.utter_message(
                         "Please keep in mind that these corrections may be wrong and should only be used as a reference")
@@ -590,5 +602,5 @@ class ActionWritingCheck(Action):
                     dispatcher.utter_message(
                         "Hooray! I did not find any errors in your provided text.")
         except:
-            dispatcher.utter_message('Sorry, I have some trouble understanding you :( Please rephrase your question.')
+            dispatcher.utter_message("Sorry, there's an error occured :(")
         return [AllSlotsReset()]
