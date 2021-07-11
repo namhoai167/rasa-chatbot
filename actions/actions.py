@@ -7,9 +7,6 @@
 import cv2
 from skimage import io
 import pytesseract
-import matplotlib.pyplot as plt
-from gingerit.gingerit import GingerIt
-import language_tool_python
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.types import DomainDict

@@ -1,5 +1,4 @@
 rasa==2.6.2
-sanic-jwt>=1.6.0
 fitbert==0.9.0
 transformers==4.5.0
 nltk==3.6.2

@@ -100,7 +100,7 @@ responses:
     - text: Hmm, the blank could be "{bot_choice}"
   utter_ask_incomplete_sentence_type_correctly:
     - text: Your sentence "{sentence}". That's seem very invalid. I'm assuming you mis-typed
-    - text: Your incomplete sentence "{sentence}"". That might invalid, please retype.
+    - text: Your incomplete sentence "{sentence}". That might invalid, please retype.
   utter_ask_choices_type_correctly:
     - text: Your choices are "{choices}". There is one choice from your input, please giving more than one.
     - text: Your choices are "{choices}". Your choices seem invalid, please retype.
