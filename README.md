@@ -16,8 +16,10 @@ python3 -m spacy download en_core_web_md
 4. Train model\
 `rasa train`
 
-5. Start 2 terminals, , \
+5. Start 2 terminals
    1. One for running action server\
    `rasa run actions`
-   2. One for chatting\
+   1. One for chatting\
    `rasa shell`
+
+[Chatbot function demo](https://www.youtube.com/playlist?list=PLpzLTT344JfnyGnPigiINg62yDJlFYvXn)
